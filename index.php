@@ -44,7 +44,7 @@
 				var sklen = skname.length;
 				if (sklen > 0) {
 					if ($target.attr('id') == 'sk_add') {
-						//if ($('td[innerHTML="' + skname + '"]').size() == 0)
+						if ($('td[innerHTML="' + skname + '"]').size() == 0)
 							$('#middle').load('getskills.php',{sk_name : skname});
 					}else if ($target.attr('id') == 'sk_change'){
 						var skid = $('#ed_sk_id').val();
