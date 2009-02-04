@@ -11,11 +11,11 @@ a:visited { color: #1500ff; }
 #top a { font-size: 14px; color: #ccc; }
 #top a:hover { font-size: 14px; color: #ccc; text-decoration: none;}
 
-#left { float: left; text-align:left; padding: 10px 30px 30px 30px; width:200px; background: #E2F5E4;}
+#left { float: left; text-align:left; padding: 10px 30px 30px 30px; width:200px; height: 500px; background: #E2F5E4;}
 
 #right { float: right; text-align:right; padding: 10px 30px 30px 30px; width:200px; background: #e0f0f4;}
 
-#middle { text-align: center; width: 400px; border: 0px none; margin-bottom: 30px; }
+#middle { text-align: left; width: 500px; border: 0px none; margin-bottom: 10px; }
 
 #footer { font-size: 10px; text-align: center; color: #7f7f7f; padding: 10px;}
 
@@ -25,7 +25,7 @@ a:visited { color: #1500ff; }
 
 fieldset { border: 0px none;}
 
-input[type=text] { background-color: #fff; border: 0px none; font-size: 20px; padding: 3px;}
+input[type=text] { background-color: #fff; font-size: 14px; padding: 1px;}
 
 input.button { font-size: 19px;}
 
@@ -47,6 +47,35 @@ p { margin: 10px 0 15px 0; }
 h1 { font-size: 3em;}
 h2 { font-size: 2em;}
 h3 { font-size: 1em;}
+
+/*
+added by vasya
+*/
+
+hr {
+	border-top: 1px dashed;
+	height: 1px;
+}
+
+div.separator{
+	background: #B0C4DE;
+}
+
+span.rollup{
+	color: blue;
+	cursor: pointer;
+}
+
+table.skills_tb{
+	text-align: center;
+	cursor: pointer;
+}
+
+table.edit_skills_tb{
+	cursor: pointer;
+}
+
+
 
 #upload { }
 
