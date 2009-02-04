@@ -1,0 +1,20 @@
+Leads and Needs
+Copyright 2009 Yesh Thirty Seven, LLC
+
+== Contributors
+Brian Russell, brian@yesh.com
+
+
+Leads and Needs is a web based social address book that matches people. Leads are people who have information about a job or freelancing opportunity. Needs are people looking for work.
+
+Often times all is needed to bring the right people together is a person who knows both the lead and the need. We call them Connectors. They are the primary users of this application.
+
+The Connector will upload address books or add entries manually. Each entry will be put in one or two categories. The lead category and the need category. The Connector will then look at two lists of leads and needs. Then they will select a lead and a need to match. Once the match is made a email form will be generated to contact both the lead and need. The Connector will then write a personal email making the introduction. 
+
+The leads-needs applications database will keep track of connections. Later on the user will check on the connections and document how they went. Did the lead give the need a job? Did the connection generate more leads? How often are needs being met? What kind of patterns are forming from the connections? Can we discover more efficient ways to make connections by looking at the timeline and patters?
+
+Over time a social graph will be generated. <http://en.wikipedia.org/wiki/Social_network> This can be visualized as a network map or viewed as raw data in rows and columns. The connector can learn from this network map and use it to make connections more efficiently.
+
+Features (to add)
+
+

@@ -1,0 +1,53 @@
+* { padding: 0; margin: 0; margin: auto; }
+
+body {background: #d1d1d1; font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif; font-size: 16px;}
+
+a { text-decoration: underline; color: #1500ff;}
+a:hover { text-decoration: none;}
+a:visited { color: #1500ff; }
+
+#container {width: 90%; position:relative; margin-top: 10px;}
+#top { background: #000; float: center; text-align: center; width: 100%; height: 30px; margin-left: auto ; margin-right: auto; padding-top: 2px; color: #fff;}
+#top a { font-size: 14px; color: #ccc; }
+#top a:hover { font-size: 14px; color: #ccc; text-decoration: none;}
+
+#left { float: left; text-align:left; padding: 10px 30px 30px 30px; width:200px; background: #E2F5E4;}
+
+#right { float: right; text-align:right; padding: 10px 30px 30px 30px; width:200px; background: #e0f0f4;}
+
+#middle { text-align: center; width: 400px; border: 0px none; margin-bottom: 30px; }
+
+#footer { font-size: 10px; text-align: center; color: #7f7f7f; padding: 10px;}
+
+#inputs { margin-top: 10px;}
+
+.field { margin: 10px 0 20px 0; }
+
+fieldset { border: 0px none;}
+
+input[type=text] { background-color: #fff; border: 0px none; font-size: 20px; padding: 3px;}
+
+input.button { font-size: 19px;}
+
+button {font-size: 14px; width: 5em;}
+
+label { margin: 15px 0 15px 0;}
+
+
+
+#river li {list-style-type: none; height: 3em;}
+
+/* #river a {color: #0038c8; text-decoration: none; padding: 4px;}
+
+#river a:hover {color: #0038c8; background-color:#eafcff; padding: 4px;}
+*/
+
+p { margin: 10px 0 15px 0; }
+
+h1 { font-size: 3em;}
+h2 { font-size: 2em;}
+h3 { font-size: 1em;}
+
+#upload { }
+
+#connections { }
