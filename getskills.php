@@ -4,7 +4,9 @@
 	$db = new DBWrap();
 	if (isset($_POST['sk_name'])){
 		if (isset($_POST['id']))
-			$query = "update skills set skill = '" . addslashes($_POST['sk_name']) . "' where skill='" . addslashes($_POST['id']) . "'";
+			if ($_POST['type']) 
+				$query = "update skills set skill = '" . addslashes($_POST['sk_name']) . "' where skill='" . addslashes($_POST['id']) . "'";
+			else $query = "delete from skills where skill='" . addslashes($_POST['id']) . "'";
 		else $query = "insert into skills (skill) values('" . addslashes($_POST['sk_name']) . "')";
 		//echo $query;
 		//exit;

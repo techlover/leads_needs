@@ -43,13 +43,17 @@
 				var skname = $('#sk_name').val();
 				var sklen = skname.length;
 				if (sklen > 0) {
-					if ($target.attr('id') == 'sk_add') {
+					var but_id = $target.attr('id');
+					if (but_id == 'sk_add') {
 						if ($('td[innerHTML="' + skname + '"]').size() == 0)
 							$('#middle').load('getskills.php',{sk_name : skname});
-					}else if ($target.attr('id') == 'sk_change'){
+					}else if (but_id == 'sk_change'){
 						var skid = $('#ed_sk_id').val();
 						if (skid != skname)
-							$('#middle').load('getskills.php',{sk_name: skname, id: skid});				
+							$('#middle').load('getskills.php',{sk_name: skname, id: skid, type: 1});				
+					}else if (but_id == 'sk_delete'){
+						var skid = $('#ed_sk_id').val();
+						$('#middle').load('getskills.php',{sk_name : skname, id: skid, type: 0});
 					}
 				}
 			}
@@ -57,8 +61,10 @@
 			if ($('table.edit_skills_tb').size() > 0) {
 				var clname = $target.html();
 				$('#sk_name').val(clname);
-				if ($('#sk_change').size() == 0) 
+				if ($('#sk_change').size() == 0) {
 					$('#sk_add').before('<input type=\'button\' id=\'sk_change\' value=\'change\'>');
+					$('#sk_add').after('<input type=\'button\' id=\'sk_delete\' value=\'delete\'>');
+				}
 				$('#ed_sk_id').val(clname);
 				var old = $('#ed_sk_act').val();
 				if (old.length > 0) $('#' + old).css('background-color','');
