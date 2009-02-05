@@ -1,11 +1,13 @@
 <?php
 
 class DBWrap {
-	var $dbHost;
-	var $dbName;
-	var $dbUser;
-	var $dbPass;	
-	var $gDBLink;
+	private $dbHost;
+	private $dbName;
+	private $dbUser;
+	private $dbPass;	
+	private $gDBLink;
+	private $query_result;
+	private $last_ins_id;
 	
 	function DBWrap($host='127.0.0.1',$name='lead_need',$user='root',$pass='cnjkbwz07'){
 		$this->dbHost = $host;
@@ -53,6 +55,9 @@ class DBWrap {
 		return (mysql_num_rows($this->query_result)); 
 	}
 	
+	function GetLastInsId(){
+		return mysql_insert_id($this->gDBLink);
+	}
 }
 
 ?>

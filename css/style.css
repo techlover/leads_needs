@@ -75,6 +75,12 @@ table.edit_skills_tb{
 	cursor: pointer;
 }
 
+p.header{
+	background-color: #E6E6FA; /*#FFC0CB;*/
+	border: 1px dashed #808080;
+	padding: 2px;
+}
+
 
 
 #upload { }

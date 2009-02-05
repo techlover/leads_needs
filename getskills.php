@@ -22,7 +22,7 @@
 	}
 	
 	$t = 1;
-	$ret = "<p>Current skills avaliable...</p>";
+	$ret = "<p class='header'>Skills avaliable (" . $count . ")</p>";
 	$ret .= "<input type='hidden' name='ed_sk_id' id='ed_sk_id' value=''>";
 	$ret .= "<input type='hidden' name='ed_sk_act' id='ed_sk_act' value=''>";
 	$ret .= "<table width='100%' cellspacing=5 class='edit_skills_tb'>";

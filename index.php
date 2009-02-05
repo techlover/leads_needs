@@ -24,9 +24,8 @@
 	  });	
 
 	  $("a.add_person").click(function(event){
-			$('#middle').load('addentry.php',{type: 'person'},function(){$('span.rollup').click(function(){$('div.separator ~ table').toggle('normal'); $(this).html('[+]');})
-						});
-			event.preventDefault();
+		$('#middle').load('addentry.php',{action: 'new'});
+		event.preventDefault();
 	  });
 
 	  $("a.skill_ln").click(function(event){
@@ -41,20 +40,27 @@
 			var type = $target[0].type.toLowerCase();
 			if (type == 'button') {
 				var skname = $('#sk_name').val();
-				var sklen = skname.length;
-				if (sklen > 0) {
-					var but_id = $target.attr('id');
-					if (but_id == 'sk_add') {
-						if ($('td[innerHTML="' + skname + '"]').size() == 0)
-							$('#middle').load('getskills.php',{sk_name : skname});
-					}else if (but_id == 'sk_change'){
-						var skid = $('#ed_sk_id').val();
-						if (skid != skname)
-							$('#middle').load('getskills.php',{sk_name: skname, id: skid, type: 1});				
-					}else if (but_id == 'sk_delete'){
-						var skid = $('#ed_sk_id').val();
-						$('#middle').load('getskills.php',{sk_name : skname, id: skid, type: 0});
+				if (skname) {
+					var sklen = skname.length;
+					if (sklen > 0) {
+						var but_id = $target.attr('id');
+						if (but_id == 'sk_add') {
+							if ($('td[innerHTML="' + skname + '"]').size() == 0)
+								$('#middle').load('getskills.php',{sk_name : skname});
+						}else if (but_id == 'sk_change'){
+							var skid = $('#ed_sk_id').val();
+							if (skid != skname)
+								$('#middle').load('getskills.php',{sk_name: skname, id: skid, type: 1});				
+						}else if (but_id == 'sk_remove'){
+							var skid = $('#ed_sk_id').val();
+							$('#middle').load('getskills.php',{sk_name : skname, id: skid, type: 0});
+						}
 					}
+				}else {
+					var but_id = $target.attr('id');
+					if (but_id == 'cont_add'){
+							$('#middle').load('addentry.php',{sk_name : skname, id: skid, type: 0});
+						}
 				}
 			}
 		}else if (tagname == 'td'){
@@ -63,7 +69,7 @@
 				$('#sk_name').val(clname);
 				if ($('#sk_change').size() == 0) {
 					$('#sk_add').before('<input type=\'button\' id=\'sk_change\' value=\'change\'>');
-					$('#sk_add').after('<input type=\'button\' id=\'sk_delete\' value=\'delete\'>');
+					$('#sk_add').after('<input type=\'button\' id=\'sk_remove\' value=\'remove\'>');
 				}
 				$('#ed_sk_id').val(clname);
 				var old = $('#ed_sk_act').val();
@@ -85,9 +91,12 @@
 <body>
 	<div id="top">
 			<strong>Welcome to Leads and Needs.</strong>
-			<a class="add_person" href="">Add Entry</a> | <a href="">Upload</a> | <a class="show_connection" href="">Connections</a> | <a class="skill_ln" href=""> Skills</a>
+			<a href="">Home</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="show_connection" href="">Connections</a> | <a class="skill_ln" href=""> Skills</a>
 	</div>
-		
+	
+<?php
+	include('DBWrap.php');
+?>		
 <div id="container">
 	
 	<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
@@ -98,45 +107,22 @@
 		<!-- <a class="prev" href="">prev</a> -->
 		<div class="scrollable">
 			<ul id="river">
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">Bob</a>
-				</li>
+			<?php
+				$db = new DBWrap();
 				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">David Thomas</a>
-				</li>
+				$lead_query = "select gname, lname from leader where status > 0";
+				$selection = $db->DoDBQueryEx($lead_query);
+				if (!$selection) die ('database error while retrieving leads');
 				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">James Protzman</a>
-				</li>
-				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">Google</a>
-				</li>
-				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">John Smith</a>
-				</li>
-				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">Jane Jones</a>
-				</li>
-				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">SAS</a>
-				</li>
-				
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">IBM</a>
-				</li>
-
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">IBM</a>
-				</li>
-
-				<li>
-					<a class="tips" href="fragment.html" rel="fragment.html" title="A lead from Bob">IBM</a>
-				</li>
+				$count = $db->GetDBQueryRowCount();
+				if ($count)
+					for ($i = 0; $i < $count; $i++){
+						$row = $db->GetDBQueryRowEx($i);
+						$name = $row["gname"] . " " . $row["lname"];
+						echo "<li><a class='tips' href='fragment.html' rel='fragment.html' title='A lead from " . $name . "'>" . $name . "</a></li>";
+					}
+				else echo "<li>Leads list is empty</li><li><a class='add_person' href='#'>Add lead</a></li>";
+			?>
 			</ul>
 		</div>
 		<!-- <a class="next">next</a> -->
@@ -146,38 +132,22 @@
 	<div id="right">
 		<h1>Needs</h1> <p>People who <em>need</em> work.</p>
 		<ul id="river">
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">John Henry</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Rick James</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Matt Busy</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Carl Coworker</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Sue Simple</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Bobby Coder</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Jim Thomas</a>
-			</li>
-			
-			<li>
-				<a class="tips" href="fragment.html" rel="fragment.html" title="A need of John's">Bono</a>
-			</li>
-			
+			<?php
+				$db = new DBWrap();
+				
+				$lead_query = "select gname, lname from demander where status > 0";
+				$selection = $db->DoDBQueryEx($lead_query);
+				if (!$selection) die ('database error while retrieving needs');
+				
+				$count = $db->GetDBQueryRowCount();
+				if ($count)
+					for ($i = 0; $i < $count; $i++){
+						$row = $db->GetDBQueryRowEx($i);
+						$name = $row["gname"] . " " . $row["lname"];
+						echo "<li><a class='tips' href='fragment.html' rel='fragment.html' title='A need from " . $name . "'>" . $name . "</a></li>";
+					}
+				else echo "<li>Needs list is empty</li><li><a class='add_person' href='#'>Add need</a></li>";
+			?>
 		</ul>
 	</div>
 
@@ -191,7 +161,39 @@
 	<!-- You can display both the leads and needs and their relationships on - connections.php -->
 	
 	<?php
-		//include 'connections.php';
+		if(isset($_POST['action'])) $action = $_POST['action'];
+		else $action = 'connect_show';
+		
+		switch ($action) {
+			case 'cont_new':{
+				if ($_POST['ptype']) $tbname = 'demander';
+				else $tbname = 'leader';
+			
+				$m_query = "insert into " . $tbname . " (status,gname,lname,address,zip,phone,email,url) values(1,'" . addslashes($_POST['gname']) ."','" . addslashes($_POST['lname']) ."','" . addslashes($_POST['address']) ."','" . addslashes($_POST['zip']) ."','" . addslashes($_POST['phone']) ."','" . addslashes($_POST['email']) ."','" . addslashes($_POST['url']) ."')";
+				$db = new DBWrap();
+				$db->DoDBQueryEx($m_query) or die('error in query 1');
+				$id = $db->GetLastInsId();
+
+				$sk_query = "";
+				foreach($_POST as $key=>$value){
+					if (stripos($key,'_') === 1) 
+						$sk_query .= "(" . $id .",'" . substr(addslashes($key),2) . "'),";
+				}
+
+				$len = strlen($sk_query);
+				if ($len > 0) {
+					$sk_query = substr($sk_query,0,$len - 1);
+					$sk_query = "insert into " . $tbname . "_skills (person_id, skill) values " . $sk_query;
+				}
+				$db->DoDBQueryEx($sk_query) or die ('error in query 2');
+
+				break;
+			}
+			case 'connect_show':{
+				include 'connections.php';
+				break;
+			}
+		}
 	?>
 	
 	</div>
