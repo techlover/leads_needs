@@ -79,8 +79,33 @@ p.header{
 	background-color: #E6E6FA; /*#FFC0CB;*/
 	border: 1px dashed #808080;
 	padding: 2px;
+	width: 100%;
 }
 
+table.pinfo{
+	width: 100%;
+	padding: 5px;
+	border: 0px;
+}
+
+table.sinfo{
+	width: 100%;
+	font-size: 12pt;
+	font-family: Courier New, Arial, Helvetica;
+	text-align: left;
+}
+
+div.separator_l{
+	display: inline;
+	text-align: left;
+	width: 50%;
+}
+
+div.separator_r{
+	display: inline;
+	text-align: right;
+	width: 50%;
+}
 
 
 #upload { }

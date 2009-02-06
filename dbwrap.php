@@ -6,8 +6,7 @@ class DBWrap {
 	private $dbUser;
 	private $dbPass;	
 	private $gDBLink;
-	private $query_result;
-	private $last_ins_id;
+	public $query_result;
 	
 	function DBWrap($host='127.0.0.1',$name='lead_need',$user='root',$pass='cnjkbwz07'){
 		$this->dbHost = $host;

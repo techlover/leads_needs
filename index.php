@@ -58,9 +58,33 @@
 					}
 				}else {
 					var but_id = $target.attr('id');
-					if (but_id == 'cont_add'){
-							$('#middle').load('addentry.php',{sk_name : skname, id: skid, type: 0});
+					//if (but_id == 'cont_add')
+					//	$('#middle').load('addentry.php',{action: 'new', id: 0});
+					if (but_id == 'cont_edit')
+						$('#middle').load('addentry.php',{action: 'edit', id: $('#person_id').val(), tp: $('#person_tp').val()});
+					if (but_id == 'cont_save'){
+						//$('#middle').load('addentry.php',{action: 'save', id: $('#person_id').val(), tp: $('#person_tp').val()});					
+						var skills = $('[input:checkbox][checked]');
+						var size = skills.size();
+						var r_data = "action=save&id=" + $('#person_id').val() + "&tp=" + $('#person_tp').val()+ "&mode=1" + 
+										"&gname=" + $('#gname').val() + "&lname=" + $('#lname').val() + 
+										"&address=" + $('#address').val() + "&zip=" + $('#zip').val() + 
+										"&phone=" + $('#phone').val() + "&email=" + $('#email').val() + 
+										"&url=" + $('#url').val();
+						for (i = 0; i < size; i++){
+							r_data += "&" + skills.eq(i).attr('name') + "=on";
 						}
+						
+						$.ajax({
+								type: 'POST',
+								url: 'addentry.php',
+								data: "" + r_data + "",
+								cache: false,
+								success: function(new_content){
+									$('#middle').html(new_content);
+								}
+								});
+					}
 				}
 			}
 		}else if (tagname == 'td'){
@@ -91,11 +115,41 @@
 <body>
 	<div id="top">
 			<strong>Welcome to Leads and Needs.</strong>
-			<a href="">Home</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="show_connection" href="">Connections</a> | <a class="skill_ln" href=""> Skills</a>
+			<a class="show_connection" href="">Connections</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="skill_ln" href=""> Skills</a>
 	</div>
 	
 <?php
 	include('DBWrap.php');
+	
+	if(isset($_POST['action'])) $action = $_POST['action'];
+	else $action = 'connect_show';
+
+	if ($_POST['ptype']) { $tbname = 'demander'; $pers_tp = 1;}
+	else { $tbname = 'leader'; $pers_tp = 0;}
+	
+	switch ($action) {
+		case 'cont_new':{
+			$m_query = "insert into " . $tbname . " (status,gname,lname,address,zip,phone,email,url) values(1,'" . addslashes($_POST['gname']) ."','" . addslashes($_POST['lname']) ."','" . addslashes($_POST['address']) ."'," . number_format($_POST['zip']) .",'" . addslashes($_POST['phone']) ."','" . addslashes($_POST['email']) ."','" . addslashes($_POST['url']) ."')";
+			//echo $m_query;
+			$db = new DBWrap();
+			$db->DoDBQueryEx($m_query) or die('error in query 1');
+			$id = $db->GetLastInsId();
+
+			$sk_query = "";
+			foreach($_POST as $key=>$value){
+				if (stripos($key,'_') === 1) 
+					$sk_query .= "(" . $id .",'" . substr(addslashes($key),2) . "'),";
+			}
+
+			$len = strlen($sk_query);
+			if ($len > 0) {
+				$sk_query = substr($sk_query,0,$len - 1);
+				$sk_query = "insert into " . $tbname . "_skills (person_id, skill) values " . $sk_query;
+				$db->DoDBQueryEx($sk_query) or die ('error in query 2');
+			}
+			break;
+		}
+	}
 ?>		
 <div id="container">
 	
@@ -110,7 +164,7 @@
 			<?php
 				$db = new DBWrap();
 				
-				$lead_query = "select gname, lname from leader where status > 0";
+				$lead_query = "select id, gname, lname from leader where status > 0";
 				$selection = $db->DoDBQueryEx($lead_query);
 				if (!$selection) die ('database error while retrieving leads');
 				
@@ -119,7 +173,7 @@
 					for ($i = 0; $i < $count; $i++){
 						$row = $db->GetDBQueryRowEx($i);
 						$name = $row["gname"] . " " . $row["lname"];
-						echo "<li><a class='tips' href='fragment.html' rel='fragment.html' title='A lead from " . $name . "'>" . $name . "</a></li>";
+						echo "<li><a class='tips' href='fragment.php?id=" . $row['id'] . "&t=l' rel='fragment.php?id=" . $row['id'] . "&t=l' title='A lead from " . $name . "'>" . $name . "</a></li>";
 					}
 				else echo "<li>Leads list is empty</li><li><a class='add_person' href='#'>Add lead</a></li>";
 			?>
@@ -135,8 +189,8 @@
 			<?php
 				$db = new DBWrap();
 				
-				$lead_query = "select gname, lname from demander where status > 0";
-				$selection = $db->DoDBQueryEx($lead_query);
+				$need_query = "select id, gname, lname from demander where status > 0";
+				$selection = $db->DoDBQueryEx($need_query);
 				if (!$selection) die ('database error while retrieving needs');
 				
 				$count = $db->GetDBQueryRowCount();
@@ -144,7 +198,7 @@
 					for ($i = 0; $i < $count; $i++){
 						$row = $db->GetDBQueryRowEx($i);
 						$name = $row["gname"] . " " . $row["lname"];
-						echo "<li><a class='tips' href='fragment.html' rel='fragment.html' title='A need from " . $name . "'>" . $name . "</a></li>";
+						echo "<li><a class='tips' href='fragment.php?id=" . $row['id'] . "&t=d' rel='fragment.php?id=" . $row['id'] . "&t=d' title='A need from " . $name . "'>" . $name . "</a></li>";
 					}
 				else echo "<li>Needs list is empty</li><li><a class='add_person' href='#'>Add need</a></li>";
 			?>
@@ -161,32 +215,43 @@
 	<!-- You can display both the leads and needs and their relationships on - connections.php -->
 	
 	<?php
-		if(isset($_POST['action'])) $action = $_POST['action'];
-		else $action = 'connect_show';
-		
 		switch ($action) {
 			case 'cont_new':{
-				if ($_POST['ptype']) $tbname = 'demander';
-				else $tbname = 'leader';
-			
-				$m_query = "insert into " . $tbname . " (status,gname,lname,address,zip,phone,email,url) values(1,'" . addslashes($_POST['gname']) ."','" . addslashes($_POST['lname']) ."','" . addslashes($_POST['address']) ."','" . addslashes($_POST['zip']) ."','" . addslashes($_POST['phone']) ."','" . addslashes($_POST['email']) ."','" . addslashes($_POST['url']) ."')";
-				$db = new DBWrap();
-				$db->DoDBQueryEx($m_query) or die('error in query 1');
-				$id = $db->GetLastInsId();
-
-				$sk_query = "";
-				foreach($_POST as $key=>$value){
-					if (stripos($key,'_') === 1) 
-						$sk_query .= "(" . $id .",'" . substr(addslashes($key),2) . "'),";
+				// now show what exactly we added in contact
+				$ch_query = "select gname,lname,address,zip,phone,email,url,(select group_concat(skill) from " . $tbname . "_skills where person_id = " . $id . " group by person_id) as skills from " . $tbname . " where id = " . $id;
+				$selection = $db->DoDBQueryEx($ch_query);
+				if (!$selection) die ('database error while retrieving saved data');
+				
+				$count = $db->GetDBQueryRowCount();
+				if ($count)	$row = $db->GetDBQueryRowEx(0);
+				else die ("contact with id=" . $id . " not found");
+						
+				echo "<h3>Contact added successfuly</h3>",
+					"<div class='separator'>Personal information</div>",
+					"<table cellspacing='3'>",
+					"<tr><td>Given name</td><td>",$row['gname'],"</td></tr>",
+					"<tr><td>Last name</td><td>",$row['lname'],"</td></tr>",
+					"<tr><td>Address</td><td>",$row['address'],"</td></tr>",
+					"<tr><td>Zip</td><td>",$row['zip'],"</td></tr>",
+					"<tr><td>Email</td><td>",$row['email'],"</td></tr>",
+					"<tr><td>Url</td><td>",$row['url'],"</td></tr></table>",
+					"<div class='separator'>Skills</div>",
+					"<table cellspacing='3'>";
+				$skills = explode(',', $row['skills']);
+				$count = count($skills);
+				$t = 1;
+				$sk ="";
+				for($i = 0; $i < $count; $i++){
+					if ($t == 1) $sk .= "<tr>";
+					$sk .= "<td>" . $skills[$i] . "</td>";
+					if ($t == 3){
+						$t = 0;
+						$sk .= "</tr>";
+					}
+					$t++;
 				}
-
-				$len = strlen($sk_query);
-				if ($len > 0) {
-					$sk_query = substr($sk_query,0,$len - 1);
-					$sk_query = "insert into " . $tbname . "_skills (person_id, skill) values " . $sk_query;
-				}
-				$db->DoDBQueryEx($sk_query) or die ('error in query 2');
-
+				echo $sk,"</table><input type='button' value='<-- edit' id='cont_edit'> <input type='button' value='continue -->'> <input type='button' value='disable contact'>",
+					"<input type='hidden' id='person_id' value=" . $id . "><input type='hidden' id='person_tp' value='",$pers_tp,"'>";
 				break;
 			}
 			case 'connect_show':{
@@ -201,6 +266,8 @@
 </div>
 <div id="footer">
 	Footer stuff --> I love Signal37 design. Can you tell?
+	<p>.Net i changed to _Net because there was problems with .Net as a name</p>
+	<p>in leader_skills database skills should be saved by "id" but not by "name", because now skills doesn't connect to their database</p>
 </div>
 </body>
 </html>
