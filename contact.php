@@ -1,4 +1,27 @@
 <?php
+	function print_skills($cols,$chbox,$all_skills,$pers_skills=''){
+		$count = count($all_skills);
+		$t = 1;
+		$sk = "<table cellspacing='3' class='sinfo'>";
+		for($i = 0; $i < $count; $i++){
+			if ($t == 1) $sk .= "<tr>";
+			$sk .= "<td>";
+			if ($pers_skills){
+				if (in_array($all_skills[$i],$pers_skills)) $ch = 'checked';
+				else $ch = '';
+			}
+			if ($chbox) $sk .= "<input type='checkbox' name='s_" . $all_skills[$i] . "' " . $ch . "> ";
+			$sk .= $all_skills[$i] . "</td>";
+			if ($t == $cols){
+				$t = 0;
+				$sk .= "</tr>";
+			}
+			$t++;
+		}
+		$sk .= "</table>";
+		return $sk;
+	}
+
 	if (empty($_POST['action'])) $action = 'new';
 	else $action = $_POST['action'];
 	
@@ -16,27 +39,17 @@
 	
 	switch ($action){
 		case ('new'): {			
-			$query = "select skill from skills order by skill asc";
+			$query = "select group_concat(skill) as skills from skills group by ''";
 			$selection = $db->DoDBQueryEx($query);
 			$count = $db->GetDBQueryRowCount();
 			if ($count == 0) {
-				$sk = "<tr><td>no skills were found in databse</td></tr>";
+				$sk = "<table class='pinfo'><tr><td>no skills were found in databse</td></tr></table>";
 			}else{
-				$t = 1;
-				$sk ="";
-				for($i = 0; $i < $count; $i++){
-					$row = $db->GetDBQueryRowEx($i);
-					if ($t == 1) $sk .= "<tr>";
-					$sk .= "<td><input type='checkbox' name='s_" . $row["skill"] . "'> " . $row["skill"] . "</td>";
-					if ($t == 3){
-						$t = 0;
-						$sk .= "</tr>";
-					}
-					$t++;
-				}
+				$row = $db->GetDBQueryRowEx(0);
+				$sk = print_skills(3,1,explode(',',$row['skills']));
 			}
 			list($gname,$lname,$address,$zip,$phone,$email,$url) = array();
-			$bt = "<input type=\"submit\" value=\"Add contact\" id='cont_add'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\">";
+			$bt = "<input type=\"button\" value=\"Add contact\" id='cont_add'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\">";
 			$hid = "";
 			break;
 		}case 'edit': {
@@ -55,26 +68,14 @@
 				$selection = $db->DoDBQueryEx($query);
 				$row = $db->GetDBQueryRowEx(0);
 				$p_skills = explode(',',$row['skills']);
-				$query = "select skill from skills order by skill asc";
+				$query = "select group_concat(skill) as skills from skills group by ''";
 				$selection = $db->DoDBQueryEx($query);
 				$count = $db->GetDBQueryRowCount();
 				if ($count == 0) {
-					$sk = "<tr><td>no skills were found in databse</td></tr>";
+					$sk = "<table class='sinfo'><tr><td>no skills were found in databse</td></tr></table>";
 				}else{
-					$t = 1;
-					$sk ="";
-					for($i = 0; $i < $count; $i++){
-						$row = $db->GetDBQueryRowEx($i);
-						if ($t == 1) $sk .= "<tr>";
-						if (in_array($row['skill'],$p_skills)) $ch = 'checked';
-						else $ch = '';
-						$sk .= "<td><input type='checkbox' name='s_" . $row["skill"] . "'" . $ch . "> " . $row["skill"] . "</td>";
-						if ($t == 3){
-							$t = 0;
-							$sk .= "</tr>";
-						}
-						$t++;
-					}
+					$row = $db->GetDBQueryRowEx(0);
+					$sk = print_skills(3,1,explode(',',$row[0]),$p_skills);
 				}
 				$bt = "<input type=\"button\" value=\"Save\" id='cont_save'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\">";
 				$hid = "<input type='hidden' id='person_id' value=" . $id . "><input type='hidden' id='person_tp' value='" . $pers_tp . "'>";
@@ -86,12 +87,21 @@
 		
 			//foreach ($_POST as $key=>$value) echo $key," = ",$value,"<br>";
 			//exit;
+			if ($_POST['mode'] > 0) {
+				$id = $_POST['id'];
+				$m_query = "update " . $tbname . " set status=1,gname='" . addslashes($_POST['gname']) . "',lname='" . addslashes($_POST['lname']) . "',address='" . addslashes($_POST['address']) ."',zip='" . $_POST['zip'] . "',phone='" . addslashes($_POST['phone']) ."',email='" . addslashes($_POST['email']) ."',url='" . addslashes($_POST['url']) ."' where id=" . $id;
+			}else{
+				$id = 0;
+				$m_query = "insert into " . $tbname . " (status,gname,lname,address,zip,phone,email,url) values(1,'" . addslashes($_POST['gname']) ."','" . addslashes($_POST['lname']) ."','" . addslashes($_POST['address']) ."'," . number_format($_POST['zip']) .",'" . addslashes($_POST['phone']) ."','" . addslashes($_POST['email']) ."','" . addslashes($_POST['url']) ."')";
+			}
+			//echo $m_query;
+			//exit;
 			
-			if (empty($_POST['id'])) $id = 0;
-			else $id = $_POST['id'];
+			//if (empty($_POST['id'])) $id = 0;
+			//else $id = $_POST['id'];
 
-			if ($id > 0) $m_query = "update " . $tbname . " set status=1,gname='" . addslashes($_POST['gname']) . "',lname='" . addslashes($_POST['lname']) . "',address='" . addslashes($_POST['address']) ."',zip='" . $_POST['zip'] . "',phone='" . addslashes($_POST['phone']) ."',email='" . addslashes($_POST['email']) ."',url='" . addslashes($_POST['url']) ."' where id=" . $id;
-			else $m_query = "insert into " . $tbname . " (status,gname,lname,address,zip,phone,email,url) values(1,'" . addslashes($_POST['gname']) ."','" . addslashes($_POST['lname']) ."','" . addslashes($_POST['address']) ."'," . number_format($_POST['zip']) .",'" . addslashes($_POST['phone']) ."','" . addslashes($_POST['email']) ."','" . addslashes($_POST['url']) ."')";
+			//if ($id > 0) $m_query = "update " . $tbname . " set status=1,gname='" . addslashes($_POST['gname']) . "',lname='" . addslashes($_POST['lname']) . "',address='" . addslashes($_POST['address']) ."',zip='" . $_POST['zip'] . "',phone='" . addslashes($_POST['phone']) ."',email='" . addslashes($_POST['email']) ."',url='" . addslashes($_POST['url']) ."' where id=" . $id;
+			//else $m_query = "insert into " . $tbname . " (status,gname,lname,address,zip,phone,email,url) values(1,'" . addslashes($_POST['gname']) ."','" . addslashes($_POST['lname']) ."','" . addslashes($_POST['address']) ."'," . number_format($_POST['zip']) .",'" . addslashes($_POST['phone']) ."','" . addslashes($_POST['email']) ."','" . addslashes($_POST['url']) ."')";
 			//echo $m_query;
 			//exit;
 			$db = new DBWrap();
@@ -110,8 +120,10 @@
 			
 			$sk_query = "";
 			foreach($_POST as $key=>$value){
-				if (stripos($key,'_') === 1) 
+				if (stripos($key,'_') === 1) {
+					//echo "key = ",$key," | mkey = ",addslashes($key),"<br>";
 					$sk_query .= "(" . $id .",'" . substr(addslashes($key),2) . "'),";
+				}
 			}
 
 			$len = strlen($sk_query);
@@ -132,7 +144,7 @@
 					
 			echo "<h3>Contact saved successfuly</h3>",
 				"<div class='separator'>Personal information</div>",
-				"<table cellspacing='3'>",
+				"<table class='pinfo'>",
 				"<tr><td>Given name</td><td>",$row['gname'],"</td></tr>",
 				"<tr><td>Last name</td><td>",$row['lname'],"</td></tr>",
 				"<tr><td>Address</td><td>",$row['address'],"</td></tr>",
@@ -140,21 +152,11 @@
 				"<tr><td>Email</td><td>",$row['email'],"</td></tr>",
 				"<tr><td>Url</td><td>",$row['url'],"</td></tr></table>",
 				"<div class='separator'>Skills</div>",
-				"<table cellspacing='3'>";
+				"<table class='sinfo'>";
+				
 			$skills = explode(',', $row['skills']);
-			$count = count($skills);
-			$t = 1;
-			$sk ="";
-			for($i = 0; $i < $count; $i++){
-				if ($t == 1) $sk .= "<tr>";
-				$sk .= "<td>" . $skills[$i] . "</td>";
-				if ($t == 3){
-					$t = 0;
-					$sk .= "</tr>";
-				}
-				$t++;
-			}
-			
+			sort($skills,SORT_STRING);
+			$sk = print_skills(3,0,$skills);
 			$bt = "<input type=\"button\" value=\"<-- edit\" id='cont_edit'> <input type=\"button\" value=\"continue -->\"> <input type=\"button\" value=\"disable contact\">";
 			$hid = "<input type='hidden' id='person_id' value=" . $id . "><input type='hidden' id='person_tp' value='" . $pers_tp . "'>";
 			echo $sk,"</table>",$bt,$hid;
@@ -167,21 +169,22 @@
 	
 	//list($gname,$lname,$address,$zip,$phone,$email,$url) = new array();
 	if ($action != 'save') echo "<h3>Adding personal information</h3><br>",
-		"<form action='index.php' method='POST'>",
+		//"<form action='index.php' method='POST'>",
+		"<form>",
 		"<input type='hidden' name='action' value='cont_new'>",
 		"<div class='separator'>Personal data</div>",
-		"<table cellpadding='5' cellspacing='3' id='pinfo'>",
+		"<table cellpadding='5' id='pinfo' class='pinfo'>",
 		"<tr><td colspan=\"2\">Provider <input type=\"radio\" name=\"ptype\" id=\"provider\" ",$lead," value='0'> &nbsp;&nbsp;Demander <input type=\"radio\" name=\"ptype\" id=\"demander\" value='1'",$need,"></td></tr>",
 		"<tr><td>Given Name</td><td><input type=\"text\" size=20 maxlength=40 id=\"gname\" name=\"gname\" value='",$gname,"'></td></tr>",
 		"<tr><td>Last Name</td><td><input type=\"text\" size=20 maxlength=40 id=\"lname\" name=\"lname\" value='",$lname,"'></td></tr>",
-		"<tr><td>Address</td><td><input type=\"text\" size=40 maxlength=100 id=\"street\" name=\"street\" value='",$address,"'></td></tr>",
+		"<tr><td>Address</td><td><input type=\"text\" size=40 maxlength=100 id=\"address\" name=\"address\" value='",$address,"'></td></tr>",
 		"<tr><td>ZIP</td><td><input type=\"text\" size=5 maxlength=5 id=\"zip\" name=\"zip\" value='",$zip,"'></td></tr>",
 		"<tr><td>Phone</td><td><input type=\"text\" size=10 maxlength=15 id=\"phone\" name=\"phone\" value='",$phone,"'></td></tr>",
 		"<tr><td>EMail</td><td><input type=\"text\" size=20 maxlength=40 id=\"email\" name=\"email\" value='",$email,"'></td></tr>",
 		"<tr><td>URL</td><td><input type=\"text\" size=30 maxlength=60 id=\"url\" name=\"url\" value='",$url,"'></td></tr>",
 		"</table>",
 		"<div class='separator'>Skills &nbsp;&nbsp;&nbsp;select all | inverse | clear all</div>",
-		"<table cellpadding='5' cellspacing='3' id='skill_table'>",
+		"<table cellpadding='5' id='skill_table' class='sinfo'>",
 		$sk,
 		"</table><br><hr>",
 		$bt,$hid,

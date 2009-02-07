@@ -24,7 +24,7 @@
 	  });	
 
 	  $("a.add_person").click(function(event){
-		$('#middle').load('addentry.php',{action: 'new'});
+		$('#middle').load('contact.php',{action: 'new'});
 		event.preventDefault();
 	  });
 
@@ -57,16 +57,23 @@
 						}
 					}
 				}else {
+					var r_data = "";
 					var but_id = $target.attr('id');
-					//if (but_id == 'cont_add')
-					//	$('#middle').load('addentry.php',{action: 'new', id: 0});
+					//if (but_id == 'cont_add'){
+					//	$('#middle').load('contact.php',{action: 'new', id: 0});
 					if (but_id == 'cont_edit')
-						$('#middle').load('addentry.php',{action: 'edit', id: $('#person_id').val(), tp: $('#person_tp').val()});
-					if (but_id == 'cont_save'){
-						//$('#middle').load('addentry.php',{action: 'save', id: $('#person_id').val(), tp: $('#person_tp').val()});					
+						r_data = "action=edit&id=" + $('#person_id').val() + "&tp=" + $('#person_tp').val();
+						//$('#middle').load('contact.php',{action: 'edit', id: $('#person_id').val(), tp: $('#person_tp').val()});
+					if ((but_id == 'cont_save') || (but_id == 'cont_add')){
+						var mode = 0;
+						var pers_ident = "";
+						if (but_id == 'cont_save') {
+							mode = '1';
+							pers_ident = "&id=" + $('#person_id').val() + "&tp=" + $('#person_tp').val();
+						}
 						var skills = $('[input:checkbox][checked]');
 						var size = skills.size();
-						var r_data = "action=save&id=" + $('#person_id').val() + "&tp=" + $('#person_tp').val()+ "&mode=1" + 
+						var r_data = "action=save" + pers_ident + "&mode=" + mode +
 										"&gname=" + $('#gname').val() + "&lname=" + $('#lname').val() + 
 										"&address=" + $('#address').val() + "&zip=" + $('#zip').val() + 
 										"&phone=" + $('#phone').val() + "&email=" + $('#email').val() + 
@@ -74,17 +81,16 @@
 						for (i = 0; i < size; i++){
 							r_data += "&" + skills.eq(i).attr('name') + "=on";
 						}
-						
-						$.ajax({
-								type: 'POST',
-								url: 'addentry.php',
-								data: "" + r_data + "",
-								cache: false,
-								success: function(new_content){
-									$('#middle').html(new_content);
-								}
-								});
 					}
+					$.ajax({
+							type: 'POST',
+							url: 'contact.php',
+							data: "" + r_data + "",
+							cache: false,
+							success: function(new_content){
+								$('#middle').html(new_content);
+							}
+					});
 				}
 			}
 		}else if (tagname == 'td'){
@@ -216,44 +222,6 @@
 	
 	<?php
 		switch ($action) {
-			case 'cont_new':{
-				// now show what exactly we added in contact
-				$ch_query = "select gname,lname,address,zip,phone,email,url,(select group_concat(skill) from " . $tbname . "_skills where person_id = " . $id . " group by person_id) as skills from " . $tbname . " where id = " . $id;
-				$selection = $db->DoDBQueryEx($ch_query);
-				if (!$selection) die ('database error while retrieving saved data');
-				
-				$count = $db->GetDBQueryRowCount();
-				if ($count)	$row = $db->GetDBQueryRowEx(0);
-				else die ("contact with id=" . $id . " not found");
-						
-				echo "<h3>Contact added successfuly</h3>",
-					"<div class='separator'>Personal information</div>",
-					"<table cellspacing='3'>",
-					"<tr><td>Given name</td><td>",$row['gname'],"</td></tr>",
-					"<tr><td>Last name</td><td>",$row['lname'],"</td></tr>",
-					"<tr><td>Address</td><td>",$row['address'],"</td></tr>",
-					"<tr><td>Zip</td><td>",$row['zip'],"</td></tr>",
-					"<tr><td>Email</td><td>",$row['email'],"</td></tr>",
-					"<tr><td>Url</td><td>",$row['url'],"</td></tr></table>",
-					"<div class='separator'>Skills</div>",
-					"<table cellspacing='3'>";
-				$skills = explode(',', $row['skills']);
-				$count = count($skills);
-				$t = 1;
-				$sk ="";
-				for($i = 0; $i < $count; $i++){
-					if ($t == 1) $sk .= "<tr>";
-					$sk .= "<td>" . $skills[$i] . "</td>";
-					if ($t == 3){
-						$t = 0;
-						$sk .= "</tr>";
-					}
-					$t++;
-				}
-				echo $sk,"</table><input type='button' value='<-- edit' id='cont_edit'> <input type='button' value='continue -->'> <input type='button' value='disable contact'>",
-					"<input type='hidden' id='person_id' value=" . $id . "><input type='hidden' id='person_tp' value='",$pers_tp,"'>";
-				break;
-			}
 			case 'connect_show':{
 				include 'connections.php';
 				break;
