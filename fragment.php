@@ -2,13 +2,10 @@
 	if (isset($_GET['id'])) $id = $_GET['id'];
 	else die('bad person id');
 	
-	if ($_GET['t'] == 'l') $table = 'leader';
-	else $table = 'demander';
-		
 	include('dbwrap.php');
 	$db = new DBWrap();
 	
-	$person = "select gname,lname,address,zip,phone,email,url,(select group_concat(skill) from " . $table . "_skills where person_id = " . $id . " group by person_id) as skills from " . $table . " where id = " . $id;
+	$person = "select gname,lname,address,zip,phone,email,url,(select group_concat(skill) from person_skills where person_id = " . $id . " group by person_id) as skills from person where id = " . $id . " and ptype=" . $_GET['t'];
 	$selection = $db->DoDBQueryEx($person);
 	if (!$selection) die ('database error while retrieving saved data');
 	

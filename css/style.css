@@ -15,7 +15,7 @@ a:visited { color: #1500ff; }
 
 #right { float: right; text-align:right; padding: 10px 30px 30px 30px; width:200px; background: #e0f0f4;}
 
-#middle { text-align: left; width: 500px; border: 0px none; margin-bottom: 10px; }
+#middle { text-align: left; width: 500px; border: 0px none; margin-bottom: 10px;}
 
 #footer { font-size: 10px; text-align: center; color: #7f7f7f; padding: 10px;}
 
@@ -35,7 +35,7 @@ label { margin: 15px 0 15px 0;}
 
 
 
-#river li {list-style-type: none; height: 3em;}
+ul.river li{list-style-type: none; height: 3em;}
 
 /* #river a {color: #0038c8; text-decoration: none; padding: 4px;}
 
@@ -109,6 +109,9 @@ div.separator_r{
 	width: 50%;
 }
 
+sup.red{
+	color: #ff0000;
+}
 
 #upload { }
 
