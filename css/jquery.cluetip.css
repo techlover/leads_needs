@@ -1,4 +1,7 @@
 /* global */
+a.highlight{
+	background-color: #FFFACD;
+}
 #cluetip-close img {
   border: 0;
 }
@@ -13,7 +16,7 @@
   width: 43px;
   height: 11px;
   position: absolute;
-  background-image: url(wait.gif);
+  background-image: url(img/bigrotation2.gif);
 }
 .cluetip-arrows {
   display: none;

@@ -458,14 +458,14 @@ clearTimeout(closeOnDelay);
                                 // within the clueTip body. more info below [6]
     showTitle:        true,     // show title bar of the clueTip, even if title attribute not set
     cluetipClass:     'jtip',// class added to outermost clueTip div in the form of 'cluetip-' + clueTipClass.
-    hoverClass:       '',       // class applied to the invoking element onmouseover and removed onmouseout
-    waitImage:        true,     // whether to show a "loading" img, which is set in jquery.cluetip.css
+    hoverClass:       'highlight',       // class applied to the invoking element onmouseover and removed onmouseout
+    waitImage:        false,     // whether to show a "loading" img, which is set in jquery.cluetip.css
     cursor:           'help',
     arrows:           false,    // if true, displays arrow on appropriate side of clueTip
     dropShadow:       true,     // set to false if you don't want the drop-shadow effect on the clueTip
     dropShadowSteps:  6,        // adjusts the size of the drop shadow
     sticky:           true,    // keep visible until manually closed
-    mouseOutClose:    false,    // close when clueTip is moused out
+    mouseOutClose:    true,    // close when clueTip is moused out
     activation:       'hover',  // set to 'click' to force user to click to show clueTip
                                 // set to 'focus' to show on focus of a form element and hide on blur
     clickThrough:     false,    // if true, and activation is not 'click', then clicking on link will take user to the link's href,
@@ -473,7 +473,7 @@ clearTimeout(closeOnDelay);
     tracking:         false,    // if true, clueTip will track mouse movement (experimental)
     delayedClose:     0,        // close clueTip on a timed delay (experimental)
     closePosition:    'title',    // location of close text for sticky cluetips; can be 'top' or 'bottom' or 'title'
-    closeText:        'Submit',  // text (or HTML) to to be clicked to close sticky clueTips
+    closeText:        '[X]',  // text (or HTML) to to be clicked to close sticky clueTips
     truncate:         0,        // number of characters to truncate clueTip's contents. if 0, no truncation occurs
 
     // effect and speed for opening clueTips

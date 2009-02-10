@@ -5,7 +5,7 @@
 	include('dbwrap.php');
 	$db = new DBWrap();
 	
-	$person = "select gname,lname,address,zip,phone,email,url,(select group_concat(skill) from person_skills where person_id = " . $id . " group by person_id) as skills from person where id = " . $id . " and ptype=" . $_GET['t'];
+	$person = "select ptype,gname,lname,address,zip,phone,email,url,(select group_concat(skill) from person_skills where person_id = " . $id . " group by person_id) as skills from person where id = " . $id . " and ptype=" . $_GET['t'];
 	$selection = $db->DoDBQueryEx($person);
 	if (!$selection) die ('database error while retrieving saved data');
 	
@@ -13,7 +13,8 @@
 	if ($count) $row = $db->GetDBQueryRowEx(0);
 	else die('no contact with id=' . $id);
 	
-	echo "<a href='#'>edit</a> | <a href='#'>disable</a> | <a href='#'>add to connection</a><br>";
+	echo "<input type='hidden' id='tipp_id' value='" . $id . "'><input type='hidden' id='tipp_type' value='" . $row['ptype'] . "'>";
+	echo "<a id='cl_cont_edit' href='#'>edit</a> | <a id='cl_cont_dis' href='#'>disable</a> | <a href='#'>add to connection</a><br>";
 	echo "Given Name &nbsp;&nbsp;<b>",$row['gname'],"</b><br>";
 	echo "Last Name &nbsp;&nbsp;<b>",$row['lname'],"</b><br>";
 	echo "Address &nbsp;&nbsp;<b>",$row['address'],"</b><br>";

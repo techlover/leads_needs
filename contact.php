@@ -139,6 +139,7 @@
 				"<tr><td>Last name</td><td>",$row['lname'],"</td></tr>",
 				"<tr><td>Address</td><td>",$row['address'],"</td></tr>",
 				"<tr><td>Zip</td><td>",($row['zip'] ? $row['zip'] : ''),"</td></tr>",
+				"<tr><td>Phone</td><td>",$row['phone'],"</td></tr>",
 				"<tr><td>Email</td><td>",$row['email'],"</td></tr>",
 				"<tr><td>Url</td><td>",$row['url'],"</td></tr></table>",
 				"<div class='separator'>Skills</div>",
