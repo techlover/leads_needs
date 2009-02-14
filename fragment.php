@@ -14,7 +14,7 @@
 	else die('no contact with id=' . $id);
 	
 	echo "<input type='hidden' id='tipp_id' value='" . $id . "'><input type='hidden' id='tipp_type' value='" . $row['ptype'] . "'>";
-	echo "<a id='cl_cont_edit' href='#'>edit</a> | <a id='cl_cont_dis' href='#'>disable</a> | <a href='#'>add to connection</a><br>";
+	echo "<a id='cl_cont_edit' href='#'>edit</a> | <a id='cl_cont_match' href='#'>match&join</a> | <a id='cl_cont_dis' href='#'>disable</a><br>";
 	echo "Given Name &nbsp;&nbsp;<b>",$row['gname'],"</b><br>";
 	echo "Last Name &nbsp;&nbsp;<b>",$row['lname'],"</b><br>";
 	echo "Address &nbsp;&nbsp;<b>",$row['address'],"</b><br>";

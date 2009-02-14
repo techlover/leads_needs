@@ -112,14 +112,14 @@
 			foreach($_POST as $key=>$value){
 				if (stripos($key,'_') === 1) {
 					//echo "key = ",$key," | mkey = ",addslashes($key),"<br>";
-					$sk_query .= "(" . $id .",'" . substr(addslashes($key),2) . "'),";
+					$sk_query .= "(" . $_POST['ptype'] . "," . $id .",'" . substr(addslashes($key),2) . "'),";
 				}
 			}
 
 			$len = strlen($sk_query);
 			if ($len > 0) {
 				$sk_query = substr($sk_query,0,$len - 1);
-				$sk_query = "insert into person_skills (person_id, skill) values " . $sk_query;
+				$sk_query = "insert into person_skills (ptype,person_id, skill) values " . $sk_query;
 				$db->DoDBQueryEx($sk_query) or die ('error in query 2');
 			}
 
@@ -184,7 +184,7 @@
 		"<tr><td>Email<sup class='red'>*</sup></td><td><input type=\"text\" size=30 maxlength=40 id=\"email\" name=\"email\" value='",$email,"'></td></tr>",
 		"<tr><td>URL</td><td><input type=\"text\" size=30 maxlength=60 id=\"url\" name=\"url\" value='",$url,"'></td></tr>",
 		"</table>",
-		"<div class='separator'>Skills &nbsp;&nbsp;&nbsp;select all | inverse | clear all</div>",
+		"<div class='separator'><div id='ldiv'>Skills</div> &nbsp;&nbsp;&nbsp;<div id='rdiv'>select all | inverse | clear all</div></div>",
 		"<table cellpadding='5' id='skill_table' class='sinfo'>",
 		$sk,
 		"</table><br><hr>",

@@ -465,7 +465,7 @@ clearTimeout(closeOnDelay);
     dropShadow:       true,     // set to false if you don't want the drop-shadow effect on the clueTip
     dropShadowSteps:  6,        // adjusts the size of the drop shadow
     sticky:           true,    // keep visible until manually closed
-    mouseOutClose:    true,    // close when clueTip is moused out
+    mouseOutClose:    false,    // close when clueTip is moused out
     activation:       'hover',  // set to 'click' to force user to click to show clueTip
                                 // set to 'focus' to show on focus of a form element and hide on blur
     clickThrough:     false,    // if true, and activation is not 'click', then clicking on link will take user to the link's href,

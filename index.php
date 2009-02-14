@@ -67,12 +67,68 @@
 			success: after
 		})
 	}
+
+	var cnt_connadd = function(event,id_el,ptype){
+		if (event) event.preventDefault();
+		r_data = "action=add&id=" + $('#' + id_el).val();
+		after = function(new_content){
+			//var 
+			$('#conn_b tr:first-child').before(new_content);
+			//$('#conn_b td:first-child').html(new_content);
+		};
+		$.ajax({
+			type: 'POST',
+			url: 'connections.php',
+			data: r_data,
+			cache: false,
+			success: after
+		})
+	}
+	
+	var cnt_match = function(event,id_el,ptype){
+		if (event) event.preventDefault();
+		var r_data = "action=match&id=" + $('#' + id_el).val() + "&ptype=" + $('#' + ptype).val();
+		var after = function(new_content){
+			var container = event.target.parentNode;
+			var panel = document.createElement('div');
+			panel.setAttribute('id','join_with');
+			container.appendChild(panel);
+			$('#join_with').css({'width': container.clientWidth + 'px', 'height': container.clientHeight + 'px', 'display': 'block'});
+			$('#join_with').html("<div><a href='#' id='join_back'>back</a> | <a href='#' id='join_do'>join</a></div><br>" + new_content);
+			$('#join_back').bind('click',function(event){$('#join_with').html(''); $('#join_with').css({'display': 'none'});});
+			$('#join_do').bind('click',function(event){
+						//$('#join_with').html(''); 
+						//$('#join_with').css({'display': 'none'});
+						var matched_p = $('#matched_p,[input:radio][checked]').val();
+						var r_data = "action=join&id=" + $('#' + id_el).val() + "&ptype=" + $('#' + ptype).val() + "&mid=" + matched_p;
+						$.ajax({
+							type: 'POST',
+							url: 'connections.php',
+							data: r_data,
+							cache: false,
+							success: function(context){
+								$('#middle').html(context);
+								$('#join_back').bind('click',function(event){$('#join_with').html(''); $('#join_with').css({'display': 'none'});});
+							}
+						})	
+			});
+		}
+		$.ajax({
+			type: 'POST',
+			url: 'connections.php',
+			data: r_data,
+			cache: false,
+			success: after
+		})
+	}
 	
 	var bind_cltips_events = {onShow: function(ct,c) {
-							$('#cl_cont_edit').bind('click',function(event){cnt_edit(event,'tipp_id');});
-							$('#cl_cont_dis').bind('click',function(event){cnt_disable(event,'tipp_id','tipp_type');});
-						}
-			};
+								$('#cl_cont_edit').bind('click',function(event){cnt_edit(event,'tipp_id');});
+								$('#cl_cont_dis').bind('click',function(event){cnt_disable(event,'tipp_id','tipp_type');});
+								//$('#cl_cont_connadd').bind('click',function(event){cnt_connadd(event,'tipp_id','tipp_type');});
+								$('#cl_cont_match').bind('click',function(event){cnt_match(event,'tipp_id','tipp_type');});
+							}
+						};
 	
 
 	
@@ -107,6 +163,11 @@
 
 		$("a.skill_ln").click(function(event){
 			$('#middle').load('getskills.php');
+			event.preventDefault();
+		});
+
+		$("a.settings_ln").click(function(event){
+			$('#middle').load('getsettings.php');
 			event.preventDefault();
 		});
 
@@ -240,14 +301,14 @@
 <body>
 	<div id="top">
 			<strong>Welcome to Leads and Needs.</strong>
-			<a class="show_connection" href="">Connections</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="skill_ln" href=""> Skills</a>
+			<a class="show_connection" href="">Connections</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="skill_ln" href=""> Skills</a> | <a class="settings_ln" href=""> Settings</a>
 	</div>
 	
 <?php
-	include('DBWrap.php');
+	//include('DBWrap.php');
 	
-	if(isset($_POST['action'])) $action = $_POST['action'];
-	else $action = 'connect_show';
+	//if(isset($_POST['action'])) $action = $_POST['action'];
+	//else $action = 'connect_show';
 ?>		
 <div id="container">
 	
@@ -260,6 +321,7 @@
 		<div class="scrollable">
 			<ul class="river" id='lpanel'>
 			<?php
+				//include_once('DBWrap.php');
 				include_once('ln_library.php');
 				echo get_plist(1);
 			?>
@@ -288,12 +350,7 @@
 	<!-- You can display both the leads and needs and their relationships on - connections.php -->
 	
 	<?php
-		switch ($action) {
-			case 'connect_show':{
-				include 'connections.php';
-				break;
-			}
-		}
+		include 'connections.php';
 	?>
 	
 	</div>
