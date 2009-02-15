@@ -329,32 +329,32 @@
 		</div>
 		<!-- <a class="next">next</a> -->
 	</div>
+	<div id='rblock'>
+		<div id="middle">
+		<!-- This form is based on hcard. Its a microformat. http://microformats.org/wiki/hcard -->
+		
+		<!-- The names of the form fields also describe the database field names. -->
+		
+		<!-- several types of data entry into the database is possible. Manually - addentry.php, Automatically - upload.php, -->
+		
+		<!-- You can display both the leads and needs and their relationships on - connections.php -->
+		
+		<?php
+			include 'connections.php';
+		?>
+		
+		</div>
 
-	<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
-	<div id="right">
-		<h1>Needs</h1> <p>People who <em>need</em> work.</p>
-		<ul class="river" id='rpanel'>		
-			<?php
-				echo get_plist(2);
-			?>
-		</ul>
+		<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
+		<div id="right">
+			<h1>Needs</h1> <p>People who <em>need</em> work.</p>
+			<ul class="river" id='rpanel'>		
+				<?php
+					echo get_plist(2);
+				?>
+			</ul>
+		</div>
 	</div>
-
-	<div id="middle">
-	<!-- This form is based on hcard. Its a microformat. http://microformats.org/wiki/hcard -->
-	
-	<!-- The names of the form fields also describe the database field names. -->
-	
-	<!-- several types of data entry into the database is possible. Manually - addentry.php, Automatically - upload.php, -->
-	
-	<!-- You can display both the leads and needs and their relationships on - connections.php -->
-	
-	<?php
-		include 'connections.php';
-	?>
-	
-	</div>
-	
 </div>
 <div id="footer">
 	Footer stuff --> I love Signal37 design. Can you tell?

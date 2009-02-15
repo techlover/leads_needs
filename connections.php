@@ -7,10 +7,12 @@
 
 	function get_connlist($db){
 		$res = "<h2>Connections</h2>".
-			"<table width='100%' id='conn' cellspacing='0'>".
-			"<thead id='conn_h'><tr><td>Lead</td><td>Need</td></tr></thead>".
-			"<tbody id='conn_b'>";
-		$conn_query = "select concat(l.gname,' ' ,l.lname) as leader, concat(n.gname,' ',n.lname) as seeker, (select group_concat(' ',skill) from person_skills where person_id=l.id group by l.id) as lskills, (select group_concat(' ',skill) from person_skills where person_id=n.id group by n.id) as nskills from connections as conn left join person as l on l.id=conn.leader_id left join person as n on n.id=conn.seeker_id where conn.status > 0";
+			"<table width='100%' id='conn_h' cellspacing='0'>".
+			"<thead id='conn_h'><tr><td>Lead</td><td>Need</td></tr></thead></table><br>".
+			"<table width='100%' id='conn' cellspacing='2'>".
+			"<col id='fcol' width='20%'><col width='20%'><col width='40%'><col id='lcol' width='20%'>";
+			//"<tbody id='conn_b'>";
+		$conn_query = "select concat(l.gname,' ' ,l.lname) as leader, concat(n.gname,' ',n.lname) as seeker, (select group_concat(' ',skill) from person_skills where person_id=l.id and ((skill) in (select ps2.skill as skills from person_skills as ps2 where ps2.person_id=n.id)) group by l.id) as skills from connections as conn left join person as l on l.id=conn.leader_id left join person as n on n.id=conn.seeker_id where conn.status > 0";
 		
 		$selection = $db->DoDBQueryEx($conn_query);
 		if (!$selection) die('error while retrieving connections data');
@@ -19,11 +21,19 @@
 			$tb_cont ="";
 			for ($i = 0; $i < $count; $i++){
 				$row = $db->GetDBQueryRowEx($i);
-				$tb_cont .= "<tr><td>" . $row['leader'] . "<br><div class='skstr'>" . $row['lskills'] . "</div></td><td>" . $row['seeker'] . "<br><div class='skstr'>" . $row['nskills'] . "</div></td></tr>";
+				$tb_cont .= "<tbody>";
+				$tb_cont .= "<tr><td class='name_cell'>" . $row['leader'] . "</td><td class='cline' colspan='2'><a href='#'>connect</a><hr class='red_line'></td><td class='name_cell'>" . $row['seeker'] . "</td></tr>";
+				$tb_cont .= "<tr><td>company1</td><td>dfg</td><td>dfg</td><td>company2</td></tr>";
+				//$tb_cont .= "<tr><td rowspan='3'>company name</td><td>matched on</td><td>" . $row['skills'] . "</td><td rowspan='3'>company name</td></tr>";
+				//$tb_cont .= "<tr><td>status</td><td>waiting introdution</td></tr>";
+				//$tb_cont .= "<tr><td>,/td><td>.</td></tr>";
+				$tb_cont .= "<tr class='sep_row'><td colspan='4'></td></tr>";
+				$tb_cont .= "</tbody>";
+				//$tb_cont .= "<tr><td>status</td><td>waiting introdution</td></tr>";
 			}				
 			$res .= $tb_cont;
 		}else $res .= "<tr><td colspan='2'>No connections found.<br><a href=''>Connect two people...</a></td>";
-		$res .= "</tbody></table>";	
+		$res .= "</table>";	
 		return $res;
 	}
 	
