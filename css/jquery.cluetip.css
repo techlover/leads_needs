@@ -44,9 +44,9 @@ a.highlight{
   background-color: transparent;
 }
 .cluetip-jtip #cluetip-outer {
-  border: 2px solid #ccc;
+  border: 1px solid #11493C;
   position: relative;
-  background-color: #fff;
+  background-color: #BBDCC1; /*#E5EECC*/
 }
 
 .cluetip-jtip h3#cluetip-title {
@@ -54,7 +54,7 @@ a.highlight{
   padding: 2px 5px;
   font-size: 16px;
   font-weight: normal;
-  background-color: #000;
+  background-color: #11493C;/*#8D0915;/*#000*/;
   color: #fff;
 }
 

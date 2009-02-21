@@ -67,7 +67,7 @@
 			success: after
 		})
 	}
-
+/*
 	var cnt_connadd = function(event,id_el,ptype){
 		if (event) event.preventDefault();
 		r_data = "action=add&id=" + $('#' + id_el).val();
@@ -84,7 +84,7 @@
 			success: after
 		})
 	}
-	
+*/	
 	var cnt_match = function(event,id_el,ptype){
 		if (event) event.preventDefault();
 		var r_data = "action=match&id=" + $('#' + id_el).val() + "&ptype=" + $('#' + ptype).val();
@@ -122,18 +122,44 @@
 		})
 	}
 	
-	var bind_cltips_events = {onShow: function(ct,c) {
+	var bind_cltips_events = {mouseOutClose: true, onShow: function(ct,c) {
 								$('#cl_cont_edit').bind('click',function(event){cnt_edit(event,'tipp_id');});
 								$('#cl_cont_dis').bind('click',function(event){cnt_disable(event,'tipp_id','tipp_type');});
 								//$('#cl_cont_connadd').bind('click',function(event){cnt_connadd(event,'tipp_id','tipp_type');});
 								$('#cl_cont_match').bind('click',function(event){cnt_match(event,'tipp_id','tipp_type');});
 							}
 						};
-	
+//--------------------------------------- end contact work----------------------
 
+//--------------------------------------- letter work --------------------------
+
+	var let_save = function(event,act_type){
+		$('div.progress').css({'display': 'inline-block'});
+		var r_data = "action=" + act_type + "&conn_id=" + $('#conn_id').val() + '&subject=' + $('#subject').val() + '&letter=' + $('#letter').val();
+		$.ajax({
+			type: 'POST',
+			url: 'connections.php',
+			data: r_data,
+			cache: false,
+			success: function(new_content){
+						var progr = $('div.progress');
+						progr.html(new_content);
+						progr.fadeOut(2000);
+					}
+		})		
+	}
+						
+	var bind_letter_events = { width: '410px', height: '370px', ajaxCache: false,
+								onShow: function(ct,c) {
+									$('#let_save').bind('click',function(event){let_save(event,'letsave');});
+									$('#let_ss').bind('click',function(event){let_save(event,'letss');});
+								},
+	}
+//--------------------------------------- end letter work -----------------------
 	
 	$(document).ready(function() {
 		$('a.tips').cluetip(bind_cltips_events);
+		$('a.intro_lnk').cluetip(bind_letter_events);
 		
 		/*
 		$('#houdini').cluetip({
@@ -195,28 +221,10 @@
 							}
 						}
 					}else {
-						var r_data = "";
-						var pt = 0;
-						var panel = '';
-						var pt2 = 0;
-						var panel2 = '';
-						var after = function(){};
 						var but_id = $target.attr('id');
-						//if (but_id == 'cont_add'){
-						//	$('#middle').load('contact.php',{action: 'new', id: 0});
 						if (but_id == 'cont_edit'){
 							cnt_edit(event,'person_id');
 							return;
-							/*
-							r_data = "action=edit&id=" + $('#person_id').val();// + "&ptype=" + $('#person_tp').val();
-							after = function(new_content){
-								$('#middle').html(new_content);
-								$('#zip,#phone').keyup(function(event){
-									var val = filterDigitField($(this).val());
-									$(this).val(val);
-								});
-							}
-							*/
 						}
 						if (but_id == 'cont_cancel'){
 							$('#middle').load('connections.php');
@@ -225,17 +233,14 @@
 						if (but_id == 'cont_disable'){
 							cnt_disable(event,'person_id','old_ptype');
 							return;
-							/*
-							r_data = "action=disable&id=" + $('#person_id').val();
-							var old = Number($('#old_ptype').val());
-							after = function(new_content){
-								$('#middle').html(new_content);
-								var pan = '#lpanel';						
-								if (old == 2) pan = '#rpanel'; 
-								$(pan).load('ln_library.php',{ptype: old, fn: 'get_plist'},function(){$('a.tips').cluetip(bind_cltips_events)});
-							};*/
 						}
 						if ((but_id == 'cont_save') || (but_id == 'cont_add')){
+							/*var r_data = "";
+							var pt = 0;
+							var panel = '';
+							var pt2 = 0;
+							var panel2 = '';
+							*/
 							if (!validate_cont_info()) return;
 							var mode = 0;
 							var pers_ident = "";
@@ -287,20 +292,68 @@
 					$target.css('background-color','#B0C4DE');
 					$('#ed_sk_act').val($target.attr('id'));
 				}
+			}else if (tagname == 'a'){
+				var tar_id = $target.attr('id');
+				if (tar_id == 'conn_remove'){
+					var conn_id = $target[0].parentNode.parentNode.parentNode.getAttribute('id').replace(/^(cb)/,'');
+					$.ajax({
+						type: 'POST',
+						url: 'connections.php',
+						data: 'action=remove&conn_id=' + conn_id,
+						cache: false,
+						success: function(new_content){
+							$("#conn tbody[id='cb" + conn_id + "']").css({'display': 'none'});
+						}
+					})
+				}
+				if (tar_id == 'xpage2'){
+					//var hor = $target.html().replace(/^\[/,'').replace(/$\]/,'');
+					//var pg = hor.split('-');
+					var pg = $target.html().replace(/^\s/,'').replace(/$\s/,'');
+					$.ajax({
+						type: 'POST',
+						url: 'connections.php',
+						//data: 'action=view&start=' + pg[0] + "&end=" + pg[1],
+						data: 'action=view&page=' + pg,
+						cache: false,
+						success: function(new_content){
+							$("#middle").html(new_content);
+							$('a.tips').cluetip(bind_cltips_events);
+							$('a.intro_lnk').cluetip(bind_letter_events);
+						}
+					})
+				}
+			}else if (tagname == 'div'){
+				var div_id = $target.attr('id');
+				if (div_id == 'conn_showfilt'){
+					var filt = $('#conn_filt');
+					if (filt.css('display') == 'none')
+						$('#conn_cont').slideUp('fast',function(){
+							var filt = $('#conn_filt');
+							$.ajax({type: 'POST', url: 'filters.php', data: 'action=f_show&fid=3', cache: true, success: function(new_content){$('#conn_filt').html(new_content)}});
+							filt.css({width: $('#conn').css('width'), height: $('#conn_cont').css('height')});
+							filt.slideDown('fast');
+						});
+				}
+				if (div_id == 'conn_showlist')
+					$('#conn_filt').slideUp('fast',function(){$('#conn_cont').slideDown('fast');});
 			}
 		});
 			
 		  
 		$("a.show_connection").click(function(event){
-				$('#middle').load('connections.php');
 				event.preventDefault();
+				$('#middle').load('connections.php',{},function(){
+					$('a.tips').cluetip(bind_cltips_events);
+					$('a.intro_lnk').cluetip(bind_letter_events);
+				});
 		  });
 	});
 	</script>	
 </head>
 <body>
 	<div id="top">
-			<strong>Welcome to Leads and Needs.</strong>
+			<b>Welcome to Leads and Needs.</b>
 			<a class="show_connection" href="">Connections</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="skill_ln" href=""> Skills</a> | <a class="settings_ln" href=""> Settings</a>
 	</div>
 	
@@ -329,7 +382,7 @@
 		</div>
 		<!-- <a class="next">next</a> -->
 	</div>
-	<div id='rblock'>
+	<!-- <div id='rblock'> -->
 		<div id="middle">
 		<!-- This form is based on hcard. Its a microformat. http://microformats.org/wiki/hcard -->
 		
@@ -343,8 +396,7 @@
 			include 'connections.php';
 		?>
 		
-		</div>
-
+		</div>			
 		<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
 		<div id="right">
 			<h1>Needs</h1> <p>People who <em>need</em> work.</p>
@@ -354,7 +406,7 @@
 				?>
 			</ul>
 		</div>
-	</div>
+	<!-- </div> -->
 </div>
 <div id="footer">
 	Footer stuff --> I love Signal37 design. Can you tell?

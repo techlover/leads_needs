@@ -37,21 +37,24 @@ class DBWrap {
 		return $this->query_result;
 	}
 
-	function GetDBQueryRow($index)
+	function GetDBQueryRow($index,$qresult=0)
 	{
-		mysql_data_seek ($this->query_result, $index);
-		return (mysql_fetch_object ($this->query_result));
+		if (!$qresult) $qresult = $this->query_result;
+		mysql_data_seek ($qresult, $index);
+		return (mysql_fetch_object ($qresult));
 	}
 	
-	function GetDBQueryRowEx($index)
+	function GetDBQueryRowEx($index,$qresult=0)
 	{
-		mysql_data_seek ($this->query_result, $index);
-		return (mysql_fetch_array ($this->query_result));		
+		if (!$qresult) $qresult = $this->query_result;
+		mysql_data_seek ($qresult, $index);
+		return (mysql_fetch_array ($qresult));		
 	}
 	
-	function GetDBQueryRowCount()
+	function GetDBQueryRowCount($qresult=0)
 	{
-		return (mysql_num_rows($this->query_result)); 
+		if (!$qresult) $qresult = $this->query_result;
+		return (mysql_num_rows($qresult)); 
 	}
 	
 	function GetLastInsId(){

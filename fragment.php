@@ -15,13 +15,16 @@
 	
 	echo "<input type='hidden' id='tipp_id' value='" . $id . "'><input type='hidden' id='tipp_type' value='" . $row['ptype'] . "'>";
 	echo "<a id='cl_cont_edit' href='#'>edit</a> | <a id='cl_cont_match' href='#'>match&join</a> | <a id='cl_cont_dis' href='#'>disable</a><br>";
-	echo "Given Name &nbsp;&nbsp;<b>",$row['gname'],"</b><br>";
-	echo "Last Name &nbsp;&nbsp;<b>",$row['lname'],"</b><br>";
-	echo "Address &nbsp;&nbsp;<b>",$row['address'],"</b><br>";
-	echo "zip &nbsp;&nbsp;<b>",$row['zip'],"</b><br>";
-	echo "Phone &nbsp;&nbsp;<b>",$row['phone'],"</b><br>";
-	echo "email &nbsp;&nbsp;<b>",$row['email'],"</b><br>";
-	echo "url &nbsp;&nbsp;<b>",$row['url'],"</b><br>";
+	echo "<table><col width='90px'><col>";
+	echo "<tr><td>Given Name</td><td><b>",$row['gname'],"</b></td></tr>";
+	echo "<tr><td>Last Name</td><td><b>",$row['lname'],"</b></td></tr>";
+	echo "<tr><td>Organization</td><td><b>?</b></td></tr>";
+	echo "<tr><td>Address</td><td><b>",$row['address'],"</b></td></tr>";
+	echo "<tr><td>zip</td><td><b>",$row['zip'],"</b></td></tr>";
+	echo "<tr><td>Phone</td><td><b>",$row['phone'],"</b></td></tr>";
+	echo "<tr><td>email</td><td><b>",$row['email'],"</b></td></tr>";
+	echo "<tr><td>url</td><td><b>",$row['url'],"</b></td></tr>";
+	echo "</table>";
 	echo "<p class='header'>Skills</p><table class='sinfo'>";
 
 	$skills = explode(',', $row['skills']);
