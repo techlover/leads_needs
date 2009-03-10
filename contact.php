@@ -1,5 +1,6 @@
 <?php
-	function print_skills($cols,$chbox,$all_skills,$pers_skills=''){
+	include('ln_library.php');
+/*	function print_skills($cols,$chbox,$all_skills,$pers_skills=''){
 		$count = count($all_skills);
 		$t = 1;
 		$sk = "<table cellspacing='3' class='sinfo'>";
@@ -21,7 +22,7 @@
 		$sk .= "</table>";
 		return $sk;
 	}
-
+*/
 	if (empty($_POST['action'])) $action = 'new';
 	else $action = $_POST['action'];
 		
@@ -30,19 +31,19 @@
 	$hid="";
 	$ptype = 1;
 	
-	include('DBWrap.php');
+//	include('DBWrap.php');
 	$db = new DBWrap();
 	
 	switch ($action){
 		case 'new': {			
-			$query = "select group_concat(skill) as skills from skills group by ''";
+			$query = "select group_concat(id) as ids,group_concat(skill) as skills from skills group by ''";
 			$selection = $db->DoDBQueryEx($query);
 			$count = $db->GetDBQueryRowCount();
 			if ($count == 0) {
 				$sk = "<table class='pinfo'><tr><td>no skills were found in databse</td></tr></table>";
 			}else{
 				$row = $db->GetDBQueryRowEx(0);
-				$sk = print_skills(3,1,explode(',',$row['skills']));
+				$sk = print_skills(4,1,$row['ids'],$row['skills']);
 			}
 			list($gname,$lname,$address,$zip,$phone,$email,$url) = array();
 			$bt = "<input type=\"button\" value=\"Add contact\" id='cont_add'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\" id='cont_cancel'>";
@@ -61,18 +62,18 @@
 			}else{
 				list($ptype,$gname,$lname,$address,$zip,$phone,$email,$url) = $db->GetDBQueryRowEx(0);
 
-				$query = "select group_concat(skill) as skills from person_skills where person_id=" . $id;
+				$query = "select group_concat(ps.skill_id) as ids from person_skills as ps where ps.person_id=" . $id;
 				$selection = $db->DoDBQueryEx($query);
 				$row = $db->GetDBQueryRowEx(0);
-				$p_skills = explode(',',$row['skills']);
-				$query = "select group_concat(skill) as skills from skills group by ''";
+				$p_skills = $row['ids'];
+				$query = "select group_concat(id) as ids,group_concat(skill) as skills from skills group by ''";
 				$selection = $db->DoDBQueryEx($query);
 				$count = $db->GetDBQueryRowCount();
 				if ($count == 0) {
 					$sk = "<table class='sinfo'><tr><td>no skills were found in databse</td></tr></table>";
 				}else{
 					$row = $db->GetDBQueryRowEx(0);
-					$sk = print_skills(3,1,explode(',',$row[0]),$p_skills);
+					$sk = print_skills(4,1,$row['ids'],$row['skills'],$p_skills);
 				}
 				$bt = "<input type=\"button\" value=\"Save\" id='cont_save'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\">";
 				$hid = "<input type='hidden' id='person_id' value=" . $id . "><input type='hidden' id='old_ptype' value=" . $ptype . ">";
@@ -107,24 +108,31 @@
 				$del_sk = "delete from person_skills where person_id=" . $id;
 				$db->DoDBQueryEx($del_sk) or die('error in while deleting skills');		
 			}
-			
+			$skills = explode(',',$_POST['skills']);
+			$c = count($skills);
 			$sk_query = "";
+			for ($i = 0; $i < $c; $i++){
+				$sk_query .= "(" . $_POST['ptype'] . "," . $id .",'" . ($skills[$i] ? $skills[$i] : 0) . "'),";
+			}
+			/*
 			foreach($_POST as $key=>$value){
 				if (stripos($key,'_') === 1) {
 					//echo "key = ",$key," | mkey = ",addslashes($key),"<br>";
 					$sk_query .= "(" . $_POST['ptype'] . "," . $id .",'" . substr(addslashes($key),2) . "'),";
 				}
 			}
-
+			*/
 			$len = strlen($sk_query);
 			if ($len > 0) {
 				$sk_query = substr($sk_query,0,$len - 1);
-				$sk_query = "insert into person_skills (ptype,person_id, skill) values " . $sk_query;
+				$sk_query = "insert into person_skills (ptype,person_id,skill_id) values " . $sk_query;
+				//die($sk_query);
 				$db->DoDBQueryEx($sk_query) or die ('error in query 2');
 			}
 
 			// now show what exactly we saved in contact
-			$ch_query = "select ptype,gname,lname,address,zip,phone,email,url,(select group_concat(skill) from person_skills where person_id = " . $id . " group by person_id) as skills from person where id = " . $id;
+			$ch_query = "select ptype,gname,lname,address,zip,phone,email,url,(select concat(group_concat(ps.skill_id),'/',group_concat(s.skill)) from person_skills as ps left join skills as s on s.id=ps.skill_id where ps.person_id = " . $id . " group by '') as skills from person where id = " . $id;
+			//die($ch_query);
 			$selection = $db->DoDBQueryEx($ch_query);
 			if (!$selection) die ('database error while retrieving saved data');
 			
@@ -145,19 +153,25 @@
 				"<div class='separator'>Skills</div>",
 				"<table class='sinfo'>";
 				
-			$skills = explode(',', $row['skills']);
-			sort($skills,SORT_STRING);
-			$sk = print_skills(3,0,$skills);
+			//$skills = explode(',', $row['skills']);
+			$s = explode('/',$row['skills']);
+			//sort($skills,SORT_STRING);
+			$sk = print_skills(3,0,$s[0],$s[1]);
 			$bt = "<input type=\"button\" value=\"<-- edit\" id='cont_edit'> <input type=\"button\" value=\"continue -->\" id='cont_cancel'> <input type=\"button\" value=\"disable contact\" id='cont_disable'>";
 			$hid = "<input type='hidden' id='person_id' value=" . $id . "><input type='hidden' id='old_ptype' value='" . $row['ptype'] . "'>";
 			echo $sk,"</table><br>",$bt,$hid;
 			break;
 		}case 'disable': {
 			//$query = "update person as p, person_skills as ps set p.status=0, ps.status=0 where p.id=" . $id . " and ps.person_id=" . $id;
-			$query1 = "update person set status=0 where id=" . $id;
-			$db->DoDBQueryEx($query1) or die('error while disabling contact');
-			$query2 = "update person_skills set status=0 where person_id=" . $id;
-			$db->DoDBQueryEx($query2) or die('error while disabling contact\'s skills');			
+			if ($_POST['ptype'] == 1) $s = 'leader_id';
+			elseif ($_POST['ptype'] == 2) $s = 'seeker_id';
+			else die('wrong person type passed');
+			$query = "update person set status=0 where id=" . $id;
+			$db->DoDBQueryEx($query) or die('error while disabling contact');
+			$query = "update person_skills set status=0 where person_id=" . $id;
+			$db->DoDBQueryEx($query) or die('error while disabling contact\'s skills');			
+			$query = "update connections set status=0 where " . $s . "=" . $id;
+			$db->DoDBQueryEx($query) or die('error while disabling contact\'s skills');			
 			include('connections.php');
 			exit;
 		}
@@ -178,16 +192,18 @@
 		"<tr><td colspan=\"2\">Provider <input type=\"radio\" name=\"pt\" id=\"leader\" ",$lead,"> &nbsp;&nbsp;Demander <input type=\"radio\" name=\"pt\" id=\"demander\" ",$need,"></td></tr>",
 		"<tr><td>Given Name<sup class='red'>*</sup></td><td><input type=\"text\" size=20 maxlength=40 id=\"gname\" name=\"gname\" value='",$gname,"'></td></tr>",
 		"<tr><td>Last Name<sup class='red'>*</sup></td><td><input type=\"text\" size=20 maxlength=40 id=\"lname\" name=\"lname\" value='",$lname,"'></td></tr>",
-		"<tr><td>Address</td><td><input type=\"text\" size=40 maxlength=100 id=\"address\" name=\"address\" value='",$address,"'></td></tr>",
-		"<tr><td>ZIP</td><td><input type=\"text\" size=5 maxlength=5 id=\"zip\" name=\"zip\" value='",($zip ? $zip : ''),"'></td></tr>",
+		"<tr><td>Company</td><td><input type=\"text\" size=20 maxlength=40 id=\"company\" name=\"company\" value='",$company,"'></td></tr>",
+		"<tr><td>Address</td><td><input type=\"text\" size=30 maxlength=100 id=\"address\" name=\"address\" value='",$address,"'>&nbsp;&nbsp;",
+		"ZIP&nbsp;&nbsp;&nbsp;<input type=\"text\" size=5 maxlength=5 id=\"zip\" name=\"zip\" value='",($zip ? $zip : ''),"'></td></tr>",
 		"<tr><td>Phone</td><td><input type=\"text\" size=12 maxlength=12 id=\"phone\" name=\"phone\" value='",$phone,"'></td></tr>",
 		"<tr><td>Email<sup class='red'>*</sup></td><td><input type=\"text\" size=30 maxlength=40 id=\"email\" name=\"email\" value='",$email,"'></td></tr>",
 		"<tr><td>URL</td><td><input type=\"text\" size=30 maxlength=60 id=\"url\" name=\"url\" value='",$url,"'></td></tr>",
 		"</table>",
-		"<div class='separator'><div id='ldiv'>Skills</div> &nbsp;&nbsp;&nbsp;<div id='rdiv'>select all | inverse | clear all</div></div>",
+		//"<div class='separator'><div id='ldiv'>Skills</div>&nbsp;&nbsp;&nbsp;<div id='rdiv'>select all | inverse | clear all</div></div>",
+		"<div class='separator'>Skills</div>",
 		"<table cellpadding='5' id='skill_table' class='sinfo'>",
 		$sk,
-		"</table><br><hr>",
+		"</table><hr>",
 		$bt,$hid,
 		"</form>";
 	

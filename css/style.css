@@ -1,25 +1,33 @@
 * { padding: 0; margin: 0; margin: auto; }
  
-body {background: #d1d1d1; font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif; font-size: 14px;}
+body {background: #d0d0d0;/*#31363E;*/ font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif; font-size: 14px;}
  
 a { text-decoration: underline; color: #1500ff;}
 a:hover { text-decoration: none;}
 a:visited { color: #1500ff; }
- 
-#top { background: #000; float: center; text-align: center; width: 100%; min-width: 1100px; height: 30px; margin-left: auto ; margin-right: auto; padding-top: 2px; color: #fff;}
+
+a.cs_act, a.ps_act {
+	color: #808080;
+}
+
+a.cs, a.ps {
+	color: #005B9A;
+}
+
+#top { background: #392839; float: center; text-align: center; width: 100%; min-width: 1100px; height: 30px; margin-left: auto ; margin-right: auto; padding-top: 2px; color: #fff;}
 #top a { font-size: 14px; color: #ccc; }
 #top a:hover { font-size: 14px; color: #ccc; text-decoration: none;}
  
-#container {width: 1070px; position:relative; margin-top: 10px; margin-bottom: 20px; overflow: hidden; height: 450px;}
+#container {width: 1010px; position:relative; margin-top: 10px; margin-bottom: 20px; overflow: hidden; height: 450px;}
 #left, #right {
 	float: left; 
-	padding: 10px 30px 30px 30px; 
+	padding: 10px 5px 10px 5px;
 	margin: 0px; 
-	width: 200px; 
+	width: 220px; 
 	height: 450px;
 }
-#left {text-align:left; background: #E2F5E4;}
-#right {text-align:right; background: #e0f0f4;}
+#left {text-align:left; background: #D8E3C5/*E2F5E4*/;}
+#right {text-align:right; background: #D8DFEB/*e0f0f4*/;}
 #middle { float: left; text-align: left; width: 490px; margin-left: 30px; margin-right: 30px; height: 450px; overflow: auto;}
 #footer { font-size: 10px; text-align: center; color: #7f7f7f; padding: 10px;}
  
@@ -57,24 +65,65 @@ added by vasya
 */
  
 hr {
-  border-top: 1px dashed;
-  height: 1px;
+	border-bottom: 1px dotted #9EB784;
+	border-top: 0px;
+	height: 0px;
+	margin-top: 3px;
 }
  
 div.separator{
   background: #B0C4DE;
+  padding: 2px;
+}
+
+div.list_menu{
+	border-bottom: 1px dotted #505050;
+	padding-bottom: 4px;
+}
+
+div.scrollable{
+	padding: 20px 25px 10px 25px;
+	height: 330px !important;
+	overflow: auto; 
+}
+/*
+a.prev, a.next{
+	width: 18px;
+	height: 18px;
+	display: block;
+	margin: 1px;
+}
+a.next:hover, a.prev:hover{
+	background-position: 0 -18px;
+}
+a.prev{
+	background: transparent url(../img/up.png) no-repeat scroll 0 0;
+}
+a.next{
+	background: transparent url(../img/down.png) no-repeat scroll 0 0;
+}
+*/
+
+div.list_status{
+	font-family: Arial,Verdana;
+	font-size: 10pt;
+	border-top: 1px dotted #505050;
+	padding-top: 4px;
 }
  
 #ldiv {
   float: left;
   min-width: 100px;
   width: 25%;
+  display: inline-block;
 }
  
 #rdiv {
   float: right;
   min-width: 300px;
   width: 75%;
+  text-align: right;
+  display: inline-block;
 }
  
 span.rollup{
@@ -87,15 +136,19 @@ table.skills_tb{
   cursor: pointer;
 }
  
-table.edit_skills_tb{
+#edit_skills_tb{
   cursor: pointer;
 }
  
 p.header{
   background-color: #E6E6FA; /*#FFC0CB;*/
-  border: 1px dashed #808080;
+  /*border: 1px dashed #808080;*/
   padding: 2px;
-  width: 100%;
+}
+
+table.left_right tr td:first-child + td{
+	text-align: right;
+	font-size: 10pt;
 }
  
 table.pinfo{
@@ -107,11 +160,12 @@ table.pinfo{
  
 table.sinfo{
   width: 100%;
-  font-size: 11pt;
+  font-size: 10pt;
   font-family: Courier New, Arial, Helvetica;
   text-align: left;
-  border-spacing: 3px;
+  padding-left: 10px;
 }
+
  
 div.separator_l{
   display: inline;
@@ -203,9 +257,10 @@ tr.sep_row2{
   display: none;
   overflow: auto;
 }
+/*
 #conn_cont {
-	background-color: #DCE0E4;
-}
+	background-color: #d1d1d1;
+}*/
 
 #conn_menu{
 	font-size: 12pt;
@@ -238,8 +293,8 @@ div.pages{
 	font-size: 10pt;
 	color: #008080;
 	width: 460px;
-	border-bottom: 1px dotted #808080;
-	padding-bottom: 4px;
+	bottom: 2px;
+	position: absolute;
 }
 
 div.progress{
@@ -252,6 +307,23 @@ div.progress{
 #letter{
 	font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif; 
 	font-size: 12px;
+}
+
+div.f_block{
+	padding-top: 10px;
+}
+
+div.list_menu div{
+	vertical-align: top;
+	display: inline-block;
+}
+
+a.xpage{
+	background: #D2C7B8;
+	padding: 0px 6px;
+	border: 1px solid #707070;
+	color: #006699;
+	text-decoration: none;
 }
 
 #upload { }

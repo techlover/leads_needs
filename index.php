@@ -8,12 +8,78 @@
 	<meta name="author" content="Brian Russell">
 	<link rel="stylesheet" href="css/jquery.cluetip.css" type="text/css" />
 	<link rel="stylesheet" href="css/style.css" type="text/css" />		
-	<script src="js/jquery-1.3.min.js" type="text/javascript"></script>
-	<script src="js/jquery.dimensions.js" type="text/javascript"></script>
-	<script src="js/jquery.hoverIntent.js" type="text/javascript"></script> <!-- optional -->
-	<script src="js/jquery.cluetip.js" type="text/javascript"></script>
-	<!-- <script src="js/jquery.scrollable-1.0.1.min.js" type="text/javascript"></script> -->
-	<script type="text/javascript">
+</head>
+<body>
+	<div id="top">
+			<b>Welcome to Leads and Needs.</b>
+			<a class="show_connection" href="">Connections</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="skill_ln" href=""> Skills</a> | <a class="settings_ln" href=""> Settings</a>
+	</div>
+<div id="container">
+	
+	<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
+	<div id="left">
+		<div>People with <em>leads</em> on work.</div>
+		<div class='list_menu'><table class='left_right' width='100%'><tr><td><a href='' class='add_person'>add</a> | <a href='' rel='filters.php?area=1' class='filter_lnk' title='Filter for lead'>filter</a></td><td>sort <a href='' class='ps' value='1'>name</a> | <a href='' class='ps_act' value='1'>date</a></td></tr></table></div>
+		<div class='scrollable'>
+			<ul class='river' id='lpanel'>
+			<?php
+				include_once('ln_library.php');
+				$cont = explode('##',get_plist(1,1));
+				echo $cont[0];
+			?>
+			</ul>
+		</div>
+		<div class='list_status' id='lpanel_summ'>
+			<?php
+				echo $cont[1];
+			?>
+		</div>
+	</div>
+	<!-- <div id='rblock'> -->
+		<div id="middle">
+		<!-- This form is based on hcard. Its a microformat. http://microformats.org/wiki/hcard -->
+		
+		<!-- The names of the form fields also describe the database field names. -->
+		
+		<!-- several types of data entry into the database is possible. Manually - addentry.php, Automatically - upload.php, -->
+		
+		<!-- You can display both the leads and needs and their relationships on - connections.php -->
+		
+		<?php
+			//include 'connections.php';
+			echo get_connlist();
+		?>
+		
+		</div>			
+		<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
+		<div id="right">
+			<div>People with <em>needs</em> on work.</div>
+			<div class='list_menu'><table class='left_right' width='100%'><tr><td><a href='' class='add_person'>add</a> | <a href='' rel='filters.php?area=2' class='filter_lnk' title='Filter for need'>filter</a></td><td>sort <a href='' class='ps' value='2'>name</a> | <a href='' class='ps_act' value='2'>date</a></td></tr></table></div>
+			<div class='scrollable'>
+				<ul class='river' id='rpanel'>
+				<?php
+					$cont = explode('##',get_plist(2,1));
+					echo $cont[0];
+				?>
+				</ul>
+			</div>
+			<div class='list_status' id='rpanel_summ'>
+				<?php
+					echo $cont[1];
+				?>
+			</div>
+		</div>
+	<!-- </div> -->
+</div>
+<div id="footer">
+	Footer stuff --> I love Signal37 design. Can you tell?
+</div>
+
+<script src="js/jquery-1.3.min.js" type="text/javascript"></script>
+<script src="js/jquery.dimensions.js" type="text/javascript"></script>
+<script src="js/jquery.hoverIntent.js" type="text/javascript"></script> <!-- optional -->
+<script src="js/jquery.cluetip.js" type="text/javascript"></script>
+<script type="text/javascript">
 	var g_ln_sc_loaded = 0;
 	
 	var bind_fdinput = function (el_list_id){ 
@@ -51,8 +117,8 @@
 					
 	var cnt_disable = function(event,id_el,ptype){
 		if (event) event.preventDefault();	
-		r_data = "action=disable&id=" + $('#' + id_el).val();
 		var old = Number($('#' + ptype).val());
+		r_data = "action=disable&id=" + $('#' + id_el).val() + "&ptype=" + old;
 		after = function(new_content){
 			$('#middle').html(new_content);
 			var pan = '#lpanel';						
@@ -129,11 +195,12 @@
 								$('#cl_cont_match').bind('click',function(event){cnt_match(event,'tipp_id','tipp_type');});
 							}
 						};
-//--------------------------------------- end contact work----------------------
+//--------------------------------------- end contact ---------------------
 
-//--------------------------------------- letter work --------------------------
+//--------------------------------------- letter --------------------------
 
 	var let_save = function(event,act_type){
+		return;
 		$('div.progress').css({'display': 'inline-block'});
 		var r_data = "action=" + act_type + "&conn_id=" + $('#conn_id').val() + '&subject=' + $('#subject').val() + '&letter=' + $('#letter').val();
 		$.ajax({
@@ -155,11 +222,66 @@
 									$('#let_ss').bind('click',function(event){let_save(event,'letss');});
 								},
 	}
-//--------------------------------------- end letter work -----------------------
+//--------------------------------------- end letter ----------------------
+//--------------------------------------- filter --------------------------
+
+	var filt_save = function(event,act_type){
+		var area = $('#farea').val();
+		var page = "";
+		var panel = "";
+		var sk = "(";
+		var act = 0;
+		if ($('#fapply').attr('checked')) act = 1;
+		var lname ='';
+		if ($('#flname').size() > 0) lname = $('#flname').val();
+		var nname ='';
+		if ($('#fnname').size() > 0) nname = $('#fnname').val();
+		var intrs = 0;
+		if ($('#fintrs').attr('checked')) intrs = 1;
+		var intrn = 0;
+		if ($('#fintrn').attr('checked')) intrn = 1;
+		if (area < 3) {
+			var skills = $('#f_block [input:checkbox][checked][id^="s"]');
+			var size = skills.size();
+			var sk = "(";
+			for (i = 0; i < size; i++){
+				sk += skills.eq(i).attr('id').replace(/^(s_)/,'') + ",";
+			}
+		}
+		if (area == 1) panel = '#lpanel';
+		else if (area == 2) panel = '#rpanel';
+			 else {panel = '#middle'; page = '&page=' + $('#curr_pg').html();}
+
+		var r_data = "action=" + act_type + "&area=" + $('#farea').val() + "&apply=" + act + "&lname=" + lname + "&nname=" + nname + "&intrs=" + intrs + "&intrn=" + intrn + "&skills=" + sk.replace(/,$/,'') + ")" + page;
+		$.ajax({
+			type: 'POST',
+			url: 'filters.php',
+			data: r_data,
+			cache: false,
+			success: function(new_content){
+						if (area == 3) {$(panel).html(new_content); $('a.filter_lnk').cluetip(bind_filter_events);}
+						else {
+							var result = new_content.split('##');					
+							$(panel).html(result[0]);
+							$(panel + '_summ').html(result[1]);
+						}
+						$('a.tips').cluetip(bind_cltips_events);
+					}
+		})		
+	}
+						
+	var bind_filter_events = { width: '390px', height: '350px', ajaxCache: false, activation: 'click',
+								onShow: function(ct,c) {
+									$('#filt_save').bind('click',function(event){filt_save(event,'f_save');});
+									//$('#filt_canc').bind('click',function(event){filt_save(event,'f_canc');});
+								},
+	}
+//--------------------------------------- end filter ----------------------
 	
 	$(document).ready(function() {
 		$('a.tips').cluetip(bind_cltips_events);
 		$('a.intro_lnk').cluetip(bind_letter_events);
+		$('a.filter_lnk').cluetip(bind_filter_events);
 		
 		/*
 		$('#houdini').cluetip({
@@ -170,21 +292,22 @@
 		*/
 
 		$("a.add_person").click(function(event){
-			//$('#middle').html('<img src="img/bigrotation2.gif">');
-			$('#middle').load('contact.php',{action: 'new'});
 			event.preventDefault();
-			if (g_ln_sc_loaded == 0) {
-				$.ajax({
-					type: 'GET',
-					url: 'js/ln.js',
-					dataType: 'script',
-					cache: false,
-					success: function(){
-						g_ln_sc_loaded = 1;
-						bind_fdinput('#zip,#phone');
-					}
-				});
-			}else bind_fdinput('#zip,#phone');
+			$(this).css('cursor','wait');
+			//$('#middle').html('<img src="img/bigrotation2.gif">');
+			$('#middle').load('contact.php',{action: 'new'}, function(){
+				$('a.add_person').css('cursor','pointer');
+				if (g_ln_sc_loaded == 0) {
+					$.ajax({
+						type: 'GET',
+						url: 'js/ln.js',
+						dataType: 'script',
+						cache: false,
+						success: function(){g_ln_sc_loaded = 1;}//bind_fdinput('#zip,#phone');
+					});
+				}//else bind_fdinput('#zip,#phone');
+				bind_fdinput('#zip,#phone');
+			});
 		});
 
 		$("a.skill_ln").click(function(event){
@@ -195,6 +318,39 @@
 		$("a.settings_ln").click(function(event){
 			$('#middle').load('getsettings.php');
 			event.preventDefault();
+		});
+
+		$("a.show_connection").click(function(event){
+				event.preventDefault();
+				$('#middle').load('connections.php',{},function(){
+					$('a.tips').cluetip(bind_cltips_events);
+					$('a.intro_lnk').cluetip(bind_letter_events);
+					$('a.filter_lnk').cluetip(bind_filter_events);
+				});
+		});
+		
+		
+		$('a.ps,a.ps_act').click(function(event){
+			event.preventDefault();
+			var cl = $(this).attr('className');
+			if (cl == 'ps_act') return;
+			
+			var ptype = $(this).attr('value');
+			if (ptype == "1") {panel = '#lpanel'; div = '#left';}
+			else {panel = '#rpanel'; div = '#right';}
+			$(div + " a.ps_act").attr('className','ps');
+			$(this).attr('className','ps_act');
+			$.ajax({
+				type: 'POST',
+				url: 'ln_library.php',
+				data: 'fn=get_plist&sortby=' + $(this).html() + '&ptype=' + ptype + '&summary=0',
+				cache: false,
+				success: function(new_content){
+					$(panel).html(new_content);
+					$('a.tips').cluetip(bind_cltips_events);
+					$('a.filter_lnk').cluetip(bind_filter_events);
+				}
+			})
 		});
 
 		$('#middle').click(function(event){
@@ -228,6 +384,8 @@
 						}
 						if (but_id == 'cont_cancel'){
 							$('#middle').load('connections.php');
+							$('a.tips').cluetip(bind_cltips_events);
+							$('a.intro_lnk').cluetip(bind_letter_events);
 							return;
 						}
 						if (but_id == 'cont_disable'){
@@ -235,12 +393,6 @@
 							return;
 						}
 						if ((but_id == 'cont_save') || (but_id == 'cont_add')){
-							/*var r_data = "";
-							var pt = 0;
-							var panel = '';
-							var pt2 = 0;
-							var panel2 = '';
-							*/
 							if (!validate_cont_info()) return;
 							var mode = 0;
 							var pers_ident = "";
@@ -250,22 +402,25 @@
 							}
 							if ($('#leader').attr('checked')) {pers_ident += "&ptype=1"; panel = '#lpanel'; pt = 1; panel2 = '#rpanel'; pt2 = 2;}
 							else {pers_ident += "&ptype=2"; panel = '#rpanel'; pt = 2; panel2 = '#lpanel'; pt2 = 1;}
-							var skills = $('[input:checkbox][checked]');
-							var size = skills.size();
 							var r_data = "action=save" + pers_ident + "&mode=" + mode +
 											"&gname=" + $('#gname').val() + "&lname=" + $('#lname').val() + 
 											"&address=" + $('#address').val() + "&zip=" + $('#zip').val() + 
 											"&phone=" + $('#phone').val() + "&email=" + $('#email').val() + 
-											"&url=" + $('#url').val();
+											"&url=" + $('#url').val() + "&skills=";
+							var skills = $('[input:checkbox][checked][id^="s"]');
+							var size = skills.size();
+							var sk = "";
 							for (i = 0; i < size; i++){
-								r_data += "&" + skills.eq(i).attr('name') + "=on";
+								sk += skills.eq(i).attr('id').replace(/^(s_)/,'') + ",";
 							}
+							r_data += sk.replace(/,$/,'');
 							after = function(new_content){
 								$('#middle').html(new_content);
 								if ((but_id == 'cont_save') || (but_id == 'cont_add')) {
 									$(panel).load('ln_library.php',{ptype: pt, fn: 'get_plist'},function(){$('a.tips').cluetip(bind_cltips_events)});
 									$(panel2).load('ln_library.php',{ptype: pt2, fn: 'get_plist'},function(){$('a.tips').cluetip(bind_cltips_events)});
 								}
+								//$(panel + '_summ').load('ln_library.php',{ptype: pt, fn: 'get_lsummary'});
 								bind_fdinput('#zip,#phone');
 							};
 						}
@@ -277,9 +432,9 @@
 							success: after
 						})
 					}
-				}
+				}else return; //skip preventDefault() in the end of function for 'radio' and 'checkbox'
 			}else if (tagname == 'td'){
-				if ($('table.edit_skills_tb').size() > 0) {
+				if ($('#edit_skills_tb').size() > 0) {
 					var clname = $target.html();
 					$('#sk_name').val(clname);
 					if ($('#sk_change').size() == 0) {
@@ -306,9 +461,8 @@
 						}
 					})
 				}
-				if (tar_id == 'xpage2'){
-					//var hor = $target.html().replace(/^\[/,'').replace(/$\]/,'');
-					//var pg = hor.split('-');
+				var cl = $target.attr('className');
+				if (cl == 'xpage'){
 					var pg = $target.html().replace(/^\s/,'').replace(/$\s/,'');
 					$.ajax({
 						type: 'POST',
@@ -320,6 +474,20 @@
 							$("#middle").html(new_content);
 							$('a.tips').cluetip(bind_cltips_events);
 							$('a.intro_lnk').cluetip(bind_letter_events);
+						}
+					})
+				}
+				if (cl == 'cs'){
+					$.ajax({
+						type: 'POST',
+						url: 'connections.php',
+						data: 'action=sort&sortby=' + $target.html() + '&page=' + $('#curr_pg').html(),
+						cache: false,
+						success: function(new_content){
+							$("#middle").html(new_content);
+							$('a.tips').cluetip(bind_cltips_events);
+							$('a.intro_lnk').cluetip(bind_letter_events);
+							$('a.filter_lnk').cluetip(bind_filter_events);
 						}
 					})
 				}
@@ -338,80 +506,9 @@
 				if (div_id == 'conn_showlist')
 					$('#conn_filt').slideUp('fast',function(){$('#conn_cont').slideDown('fast');});
 			}
-		});
-			
-		  
-		$("a.show_connection").click(function(event){
-				event.preventDefault();
-				$('#middle').load('connections.php',{},function(){
-					$('a.tips').cluetip(bind_cltips_events);
-					$('a.intro_lnk').cluetip(bind_letter_events);
-				});
-		  });
+			event.preventDefault();
+		});		
 	});
 	</script>	
-</head>
-<body>
-	<div id="top">
-			<b>Welcome to Leads and Needs.</b>
-			<a class="show_connection" href="">Connections</a> | <a class="add_person" href="">Add contact</a> | <a href="">Upload</a> | <a class="skill_ln" href=""> Skills</a> | <a class="settings_ln" href=""> Settings</a>
-	</div>
-	
-<?php
-	//include('DBWrap.php');
-	
-	//if(isset($_POST['action'])) $action = $_POST['action'];
-	//else $action = 'connect_show';
-?>		
-<div id="container">
-	
-	<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
-	<div id="left">
-		<div>
-			<h1>Leads</h1> <p>People with <em>leads</em> on work.</p>
-		</div>
-		<!-- <a class="prev" href="">prev</a> -->
-		<div class="scrollable">
-			<ul class="river" id='lpanel'>
-			<?php
-				//include_once('DBWrap.php');
-				include_once('ln_library.php');
-				echo get_plist(1);
-			?>
-			</ul>
-		</div>
-		<!-- <a class="next">next</a> -->
-	</div>
-	<!-- <div id='rblock'> -->
-		<div id="middle">
-		<!-- This form is based on hcard. Its a microformat. http://microformats.org/wiki/hcard -->
-		
-		<!-- The names of the form fields also describe the database field names. -->
-		
-		<!-- several types of data entry into the database is possible. Manually - addentry.php, Automatically - upload.php, -->
-		
-		<!-- You can display both the leads and needs and their relationships on - connections.php -->
-		
-		<?php
-			include 'connections.php';
-		?>
-		
-		</div>			
-		<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
-		<div id="right">
-			<h1>Needs</h1> <p>People who <em>need</em> work.</p>
-			<ul class="river" id='rpanel'>		
-				<?php
-					echo get_plist(2);
-				?>
-			</ul>
-		</div>
-	<!-- </div> -->
-</div>
-<div id="footer">
-	Footer stuff --> I love Signal37 design. Can you tell?
-	<p>.Net i changed to _Net because there was problems with .Net as a name</p>
-	<p>in leader_skills database skills should be saved by "id" but not by "name", because now skills doesn't connect to their database</p>
-</div>
 </body>
 </html>

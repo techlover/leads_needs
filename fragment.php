@@ -2,10 +2,11 @@
 	if (isset($_GET['id'])) $id = $_GET['id'];
 	else die('bad person id');
 	
-	include('dbwrap.php');
+	include('ln_library.php');
+	//include('dbwrap.php');
 	$db = new DBWrap();
 	
-	$person = "select ptype,gname,lname,address,zip,phone,email,url,(select group_concat(skill) from person_skills where person_id = " . $id . " group by person_id) as skills from person where id = " . $id . " and ptype=" . $_GET['t'];
+	$person = "select ptype,gname,lname,address,zip,phone,email,url,(select concat(group_concat(ps.skill_id),'/',group_concat(s.skill)) from person_skills as ps left join skills as s on s.id=ps.skill_id where ps.person_id = " . $id . " group by '') as skills from person where id = " . $id . " and ptype=" . $_GET['t'];
 	$selection = $db->DoDBQueryEx($person);
 	if (!$selection) die ('database error while retrieving saved data');
 	
@@ -14,7 +15,7 @@
 	else die('no contact with id=' . $id);
 	
 	echo "<input type='hidden' id='tipp_id' value='" . $id . "'><input type='hidden' id='tipp_type' value='" . $row['ptype'] . "'>";
-	echo "<a id='cl_cont_edit' href='#'>edit</a> | <a id='cl_cont_match' href='#'>match&join</a> | <a id='cl_cont_dis' href='#'>disable</a><br>";
+	echo "<a id='cl_cont_edit' href='#'>edit</a> | <a id='cl_cont_match' href='#'>match&join</a> | <a id='cl_cont_dis' href='#'>disable</a><br><br>";
 	echo "<table><col width='90px'><col>";
 	echo "<tr><td>Given Name</td><td><b>",$row['gname'],"</b></td></tr>";
 	echo "<tr><td>Last Name</td><td><b>",$row['lname'],"</b></td></tr>";
@@ -25,9 +26,11 @@
 	echo "<tr><td>email</td><td><b>",$row['email'],"</b></td></tr>";
 	echo "<tr><td>url</td><td><b>",$row['url'],"</b></td></tr>";
 	echo "</table>";
-	echo "<p class='header'>Skills</p><table class='sinfo'>";
+	echo "<p class='header'>Skills</p>";
 
-	$skills = explode(',', $row['skills']);
+	$skills = explode('/', $row['skills']);
+	echo print_skills(3,0,$skills[0],$skills[1]);
+	/*
 	$count = count($skills);
 	$t = 1;
 	$sk ="";
@@ -41,7 +44,7 @@
 		$t++;
 	}
 	echo $sk,"</table>";
-	
+	*/
 	
 	/*
 Middle Name Family Name<br />
