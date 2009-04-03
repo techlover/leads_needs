@@ -3,7 +3,7 @@
 	include('ln_library.php');
 	$db = new DBWrap();
 	
-	$amountpp = 3; // amount of connections to show per page
+	$amountpp = 15; // amount of connections to show per page
 	$linkspp = 5;  // amount of numbered links in line to show on page exmpl. 1 2 3 4 ...
 	
 	if (empty($_POST['action']))

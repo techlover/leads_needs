@@ -25,12 +25,14 @@ CREATE TABLE `connections` (
   `status` tinyint(1) unsigned NOT NULL default '1',
   `leader_id` int(10) unsigned NOT NULL default '0',
   `seeker_id` int(10) unsigned NOT NULL default '0',
-  `intro_date` datetime default NULL,
   `letter_date` datetime default NULL,
   `letter_subj` char(45) default '""',
   `letter` text,
-  `letter_stat` tinyint(1) unsigned NOT NULL default '3' COMMENT '3-no letter;2-saved;1-successfuly sent;0-sending error.',
-  `feedback` char(255) default '""',
+  `letter_stat` tinyint(1) unsigned NOT NULL default '3' COMMENT '3-sending error;2-successfuly sent;1-saved as draft;0-no letter.',
+  `l_feed` tinyint(1) unsigned NOT NULL default '0' COMMENT '7-error sending feedback letter;6-stop bugging;5-extedned info;4-bad feedback;3-not work yet;2-good feedback;1-no feedback;0-draft',
+  `n_feed` tinyint(1) unsigned NOT NULL default '0' COMMENT '7-error sending feedback letter;6-stop bugging;5-extedned info;4-bad feedback;3-not work yet;2-good feedback;1-no feedback;0-draft',
+  `l_feed_date` date default NULL,
+  `n_feed_date` date default NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `pare` (`leader_id`,`seeker_id`),
   KEY `date` (`letter_date`),
@@ -44,7 +46,7 @@ CREATE TABLE `connections` (
 
 LOCK TABLES `connections` WRITE;
 /*!40000 ALTER TABLE `connections` DISABLE KEYS */;
-INSERT INTO `connections` VALUES (2,1,145,147,'2009-02-19 18:46:50','2009-02-22 00:09:36','Introduction letter from Brian Russell','ks.djfh kjd dkjjd dh dj sdf \nd f djd df34 dh 234 dfd',2,'\"\"'),(3,1,144,148,'2009-02-19 18:46:50','2009-02-19 21:39:32','Introduction letter from Brian Russell','key ekrthejr',1,'\"\"'),(4,1,145,148,'2009-02-19 18:46:50','2009-02-19 22:35:34','Introduction letter from Brian Russell','jsjsj xc dfd dsfdsfd',2,'\"\"'),(5,1,149,150,'2009-02-19 18:46:50','0000-00-00 00:00:00','Introduction letter from Brian Russell','Hello Bob\na cvxcv sdkjfh ksjdfhskd ',3,'\"\"'),(6,1,143,150,'2009-02-19 18:46:50',NULL,'\"\"',NULL,3,'\"\"'),(7,1,151,150,NULL,NULL,'\"\"',NULL,3,'\"\"'),(8,1,144,150,NULL,NULL,'\"\"',NULL,1,'\"\"'),(9,0,146,147,NULL,NULL,'\"\"',NULL,3,'\"\"'),(10,1,152,148,NULL,NULL,'\"\"',NULL,3,'\"\"'),(11,1,151,148,NULL,NULL,'\"\"',NULL,3,'\"\"'),(12,1,151,147,NULL,NULL,'\"\"',NULL,3,'\"\"'),(13,1,152,147,NULL,NULL,'\"\"',NULL,3,'\"\"'),(14,0,155,148,NULL,NULL,'\"\"',NULL,3,'\"\"'),(15,1,156,148,NULL,NULL,'\"\"',NULL,3,'\"\"');
+INSERT INTO `connections` VALUES (2,1,145,147,'2009-02-22 00:09:36','Introduction letter from Brian Russell','ks.djfh kjd dkjjd dh dj sdf \nd f djd df34 dh 234 dfd',2,1,2,NULL,NULL),(3,1,144,148,'2009-02-19 21:39:32','Introduction letter from Brian Russell','key ekrthejr',1,0,1,NULL,NULL),(4,1,145,148,'2009-02-19 22:35:34','Introduction letter from Brian Russell','jsjsj xc dfd dsfdsfd',2,2,0,NULL,NULL),(5,1,149,150,'0000-00-00 00:00:00','Introduction letter from Brian Russell','Hello Bob\na cvxcv sdkjfh ksjdfhskd ',2,3,0,NULL,NULL),(6,1,143,150,NULL,'\"\"',NULL,3,4,0,NULL,NULL),(7,1,151,150,NULL,'\"\"',NULL,3,5,4,NULL,NULL),(8,1,144,150,'2009-04-01 18:06:34','sldkg','asdfasfsa',1,6,5,NULL,NULL),(9,0,146,147,NULL,'\"\"',NULL,3,7,8,NULL,NULL),(10,1,152,148,'2009-03-30 16:28:19','Introduction letter from Brian Russell','adskjfh kasdj fhasdkljfhlakdsjfh alsdkjfh ',3,0,9,NULL,NULL),(11,1,151,148,NULL,'\"\"',NULL,3,0,0,NULL,NULL),(12,1,151,147,NULL,'\"\"',NULL,3,0,3,NULL,NULL),(13,1,152,147,'2009-04-01 18:06:24','dgdssdgdsg x',' oijtrqwer02394234 32l wk23094 32\'23 4;23[p\" 3\"32 432\"3 213 4/ \\ \\3 ;ldsk dsa aw kljrhaslkjfh asldjkfh aldskjfhsl adkjfha\'\\\'lsdf  ds\"a f\\n \n\\adsf  asdf asdf s adf  asdf as dfasas\nsfsdf ds asjgh jsd h\nffasdf as asdasd a\nsd as d as \nasd\nas\nd \na \n235v325 3425 345 34534 534\nbye:)',1,2,1,'2009-03-31',NULL),(14,0,155,148,NULL,'\"\"',NULL,3,0,0,NULL,NULL),(15,1,156,148,NULL,'\"\"',NULL,3,0,0,NULL,NULL);
 /*!40000 ALTER TABLE `connections` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -66,7 +68,7 @@ CREATE TABLE `filters` (
 
 LOCK TABLES `filters` WRITE;
 /*!40000 ALTER TABLE `filters` DISABLE KEYS */;
-INSERT INTO `filters` VALUES (1,1,'lnm;con;joi;sk=>o#0#0#(12,7)'),(2,0,'con;joi;sk=>0#0#(12,6,8)'),(3,0,'nnm;con;joi;sk=>k#0#0#()'),(4,1,'order by name;0'),(5,1,'order by name;0'),(6,1,'order by leader;0');
+INSERT INTO `filters` VALUES (1,0,'lnm;con;joi;sk=>o#0#0#(12,7)'),(2,0,'con;joi;sk=>0#0#(12,6,8)'),(3,0,'lnm;con;joi;sk=>tom#0#0#()'),(4,1,'order by name;0'),(5,1,'order by name;0'),(6,1,'order by leader;0');
 /*!40000 ALTER TABLE `filters` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,6 +90,31 @@ CREATE TABLE `glsettings` (
 LOCK TABLES `glsettings` WRITE;
 /*!40000 ALTER TABLE `glsettings` DISABLE KEYS */;
 /*!40000 ALTER TABLE `glsettings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `letter_templates`
+--
+
+DROP TABLE IF EXISTS `letter_templates`;
+CREATE TABLE `letter_templates` (
+  `id` tinyint(2) unsigned NOT NULL auto_increment,
+  `name` char(20) collate cp1251_ukrainian_ci default NULL,
+  `from_email` char(30) collate cp1251_ukrainian_ci default 'brian@carrborocoworking.com',
+  `from_name` char(30) collate cp1251_ukrainian_ci default 'Brian Russell - CCC',
+  `subject` char(20) collate cp1251_ukrainian_ci default NULL,
+  `text` text collate cp1251_ukrainian_ci,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=cp1251 COLLATE=cp1251_ukrainian_ci;
+
+--
+-- Dumping data for table `letter_templates`
+--
+
+LOCK TABLES `letter_templates` WRITE;
+/*!40000 ALTER TABLE `letter_templates` DISABLE KEYS */;
+INSERT INTO `letter_templates` VALUES (1,'intro','brian@carrborocoworking.com','Brian Russell - CCC','\"\"',NULL),(2,'feedback','brian@carrborocoworking.com','Brian Russell - CCC','Dear person','<html><body><p>Dear $person_name1,</p><p>Would you like to give few seconds for sending feedback about your connection with $person_name2?<br>Consider following options:</p><p><a href=\'$link_good\' target=\'_blank\'>I had a great experience with $person_name2</a></p><p><a href=\'$link_pend\'>We haven\'t start working yet</a></p><p><a href=\'$link_bad\'>No, our collaboration did not trurned out</a></p><br><p>If you would like to describe your collaboration a bit more, click <a href=\'$link_more\'>here</a>.</p><br><p>Or no disturbing any more <a href=\'$link_stop\'>stop bugging me</a>.</p></body></html>');
+/*!40000 ALTER TABLE `letter_templates` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -181,4 +208,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-03-10 13:45:38
+-- Dump completed on 2009-04-03  4:09:02

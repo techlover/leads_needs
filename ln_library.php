@@ -15,6 +15,15 @@
 			}case 'get_lsummary':{
 				echo get_lsummary($ptype);
 				break;
+			}case 'get_connstatus':{
+				echo get_connstatus($_POST['conn_id']);
+				break;
+			}case 'get_letter':{
+				echo get_letter($_POST['conn_id']);
+				break;
+			}case 'save_letter':{
+				echo save_letter($_POST['conn_id'],$_POST['subject'],$_POST['let_text'],$_POST['send']);
+				break;
 			}
 		}
 	}
@@ -79,7 +88,7 @@
 		if ($count)
 			for ($i = 0; $i < $count; $i++){
 				$row = $db->GetDBQueryRowEx($i);
-				$res .= "<li><a class='tips' href='fragment.php?id=" . $row['id'] . "&t=" . $ptype . "' rel='fragment.php?id=" . $row['id'] . "&t=" . $ptype . "' title='A " . $category . " from " . $row['name'] . "'>" . $row['name'] . "</a></li>";
+				$res .= "<li><a class='tips' href='fragment.php?id=" . $row['id'] . "&t=" . $ptype . "' rel='fragment.php?id=" . $row['id'] . "&t=" . $ptype . "' title='A " . $category . " from " . $row['name'] . "'>" . $row['name'] . "</a><div class='persi'>sdjfhg sjfgsd</div></li>";
 			}
 		else $res .= "<li>" . $category . "s list is empty</li>";//<li><a class='add_person' href='#'>Add " . $category . "</a></li>";
 		$res .= "</ul>";
@@ -157,7 +166,7 @@
 		return $sk;
 	}
 	
-	function get_connlist($amountpp=3,$linkspp=5){
+	function get_connlist($amountpp=15,$linkspp=5){
 		if (empty($_POST['page'])) $page = 0;
 		else $page = $_POST['page'] - 1;
 		//$amountpp = 3; // amount of connections to show per page
@@ -208,9 +217,10 @@
 		//	"<table width='100%' id='conn_h' cellspacing='0'>".
 		//	"<thead id='conn_h'><tr><td>Lead</td><td>Need</td></tr></thead></table><br>".
 			"<table width='100%' id='conn' cellspacing='2'>".
-			"<col class='def_col'><col class='sep_col'><col><col class='del_col'>";
+			"<col class='l_col'><col class='sep_col'><col class='n_col'><col class='del_col'>";
 		//$conn_query = "select SQL_CALC_FOUND_ROWS UNIX_TIMESTAMP(conn.letter_date) as letter_date, UNIX_TIMESTAMP(conn.intro_date) as intro_date, conn.letter_stat as letter_stat, conn.id as conn_id, l.id as leader_id, concat(l.gname,' ' ,l.lname) as leader, n.id as seeker_id, concat(n.gname,' ',n.lname) as seeker, ifnull((select group_concat(' ',s.skill) from person_skills as ps left join skills as s on s.id=ps.skill_id where ps.status>0 and ps.person_id=l.id and ((ps.skill_id) in (select ps2.skill_id as skill_id from person_skills as ps2 where ps2.person_id=n.id)) group by l.id),'<div style=\'color: #DC143C\'>no matching</div>') as skills from connections as conn left join person as l on l.id=conn.leader_id left join person as n on n.id=conn.seeker_id where conn.status>0 and n.status>0 and l.status>0 " . $sortby . " limit " . $page*$app . "," . $app; //. $start . "," . $app;
-		$conn_query = "select SQL_CALC_FOUND_ROWS UNIX_TIMESTAMP(conn.letter_date) as letter_date, UNIX_TIMESTAMP(conn.intro_date) as intro_date, conn.letter_stat as letter_stat, conn.id as conn_id, l.id as leader_id, concat(l.gname,' ' ,l.lname) as leader, n.id as seeker_id, concat(n.gname,' ',n.lname) as seeker, ifnull((select group_concat(' ',s.skill) from person_skills as ps left join skills as s on s.id=ps.skill_id where ps.status>0 and ps.person_id=l.id and ((ps.skill_id) in (select ps2.skill_id as skill_id from person_skills as ps2 where ps2.person_id=n.id)) group by l.id),'<div style=\'color: #DC143C\'>no matching</div>') as skills from connections as conn left join person as l on l.id=conn.leader_id left join person as n on n.id=conn.seeker_id where conn.status>0 and n.status>0 and l.status>0 " . $lnm . $nnm . $str . " " . $sortby . " limit " . $page*$amountpp . "," . $amountpp; //. $start . "," . $app;
+		//$conn_query = "select SQL_CALC_FOUND_ROWS UNIX_TIMESTAMP(conn.letter_date) as letter_date, UNIX_TIMESTAMP(conn.intro_date) as intro_date, conn.letter_stat as letter_stat, conn.id as conn_id, l.id as leader_id, concat(l.gname,' ' ,l.lname) as leader, n.id as seeker_id, concat(n.gname,' ',n.lname) as seeker, ifnull((select group_concat(' ',s.skill) from person_skills as ps left join skills as s on s.id=ps.skill_id where ps.status>0 and ps.person_id=l.id and ((ps.skill_id) in (select ps2.skill_id as skill_id from person_skills as ps2 where ps2.person_id=n.id)) group by l.id),'<div style=\'color: #DC143C\'>no matching</div>') as skills from connections as conn left join person as l on l.id=conn.leader_id left join person as n on n.id=conn.seeker_id where conn.status>0 and n.status>0 and l.status>0 " . $lnm . $nnm . $str . " " . $sortby . " limit " . $page*$amountpp . "," . $amountpp;
+		$conn_query = "select SQL_CALC_FOUND_ROWS conn.id as conn_id, concat(l.gname,' ' ,l.lname) as leader, concat(n.gname,' ',n.lname) as seeker, conn.l_feed, conn.n_feed from connections as conn left join person as l on l.id=conn.leader_id left join person as n on n.id=conn.seeker_id where conn.status>0 and n.status>0 and l.status>0 " . $lnm . $nnm . $str . " " . $sortby . " limit " . $page*$amountpp . "," . $amountpp;
 		//return $conn_query;
 		$selection = $db->DoDBQueryEx($conn_query);
 		if (!$selection) die('error while retrieving connections data' . mysql_error());
@@ -223,8 +233,9 @@
 			for ($i = 0; $i < $count; $i++){
 				$row = $db->GetDBQueryRowEx($i,$selection);
 				$tb_cont .= "<tbody id='cb" . $row['conn_id'] . "'>";
-				$tb_cont .= "<tr><td><a class='tips' href='fragment.php?id=" . $row['leader_id'] . "&t=1' rel='fragment.php?id=" . $row['leader_id'] . "&t=1' title='" . $row['leader'] . "'>" . $row['leader'] . "</a></td><td><=></td><td><a class='tips' href='fragment.php?id=" . $row['seeker_id'] . "&t=2' rel='fragment.php?id=" . $row['seeker_id'] . "&t=2' title='" . $row['seeker'] . "'>" . $row['seeker'] . "</td><td><a href='#' title='remove connection' id='conn_remove'>[X]</a></td></tr>";//<input type='hidden' id='conn" . $p . "_id' value='" . $row['conn_id'] . "'></td>";
-				$tb_cont .= "<tr class='sep_row1'><td colspan='4'></td></tr>";
+				//$tb_cont .= "<tr><td><a class='tips' href='fragment.php?id=" . $row['leader_id'] . "&t=1' rel='fragment.php?id=" . $row['leader_id'] . "&t=1' title='" . $row['leader'] . "'>" . $row['leader'] . "</a></td><td><=></td><td><a class='tips' href='fragment.php?id=" . $row['seeker_id'] . "&t=2' rel='fragment.php?id=" . $row['seeker_id'] . "&t=2' title='" . $row['seeker'] . "'>" . $row['seeker'] . "</td><td><a href='#' title='remove connection' id='conn_remove'>[X]</a></td></tr>";//<input type='hidden' id='conn" . $p . "_id' value='" . $row['conn_id'] . "'></td>";
+				$tb_cont .= "<tr><td><a href=''>" . $row['leader'] . "</a></td><td><div class='col_" . $row['l_feed'] . " rbw_el'></div><=><div class='col_" . $row['n_feed'] . " rbw_el'></div></td><td class='text_align_right'><a href=''>" . $row['seeker'] . "</td><td class='text_align_right'><a href='#' title='remove connection' id='conn_remove'>[X]</a></td></tr>";//<input type='hidden' id='conn" . $p . "_id' value='" . $row['conn_id'] . "'></td>";
+			/*	$tb_cont .= "<tr class='sep_row1'><td colspan='4'></td></tr>";
 				$out1 = "";
 				$out2 = "";
 				if ($row['letter_date']) $out1 = "<br>letter saved " . date("m.d.Y",$row['letter_date']);
@@ -240,7 +251,7 @@
 				}
 				$tb_cont .= "<tr class='status_row'><td>matching</td><td></td><td class='code_text'>" . $row['skills'] . "</td><td></td></tr>";
 				$tb_cont .= "<tr class='sep_row2'><td colspan='4'></td></tr>";
-				$tb_cont .= "</tbody>";
+			*/	$tb_cont .= "</tbody>";
 				//$p++;
 			}				
 			$res .= $tb_cont;
@@ -248,6 +259,99 @@
 		$res .= "</table>";
 		//$res .= "<div class='pages'>" . get_pglinks(1,$rtotal,$app,1) . "</div>";
 		$res .= "<div class='pages'>" . get_pglinks2($page,$rtotal,$amountpp,$linkspp) . "</div></div>";
+		return $res;
+	}
+	
+	function get_connstatus($conn_id){
+		if ($conn_id < 1) return('wrong connection id');
+		$res = "<table width='100%'>";
+		$db = new DBWrap();
+		$stat = "select UNIX_TIMESTAMP(con.letter_date) as letter_date, con.letter_stat, con.l_feed, con.n_feed from connections as con where con.id=" . $conn_id;
+		
+		$selection = $db->DoDBQueryEx($stat);
+		if (!$selection) $res .= '<tr><td>database error while retrieving letter data</td></tr>';
+		else {
+			$row = $db->GetDBQueryRowEx(0);
+			$let_stat = array('no letter', 'draft', 'letter sent', 'failed to send letter');
+			$c = count($let_stat);
+			if ($row['letter_stat'] > $c) $st = '? status';
+			else $st = $let_stat[$row['letter_stat']];
+			
+			//die ('stat=' . $row['letter_stat'] . " --> " . $let_stat[$row['letter_stat']]);
+	/*		if ($row['letter_stat'] == 0) $st = 'no letter';
+			elseif ($row['letter_stat'] == 1) $st = 'draft';
+			elseif ($row['letter_stat'] == 2) $st = 'letter sent';
+			elseif ($row['letter_stat'] == 3) $st = 'failed to send letter';
+			else $st = '? status';
+	*/		
+			$feed_stat = array('draft', 'no feedback', 'good','pending','bad','more info','dont bug','error asking feed');
+			$c = count($feed_stat);
+			if ($row['l_feed'] > $c) $lf = '? status';
+			else $lf = $feed_stat[$row['l_feed']];
+			if ($row['n_feed'] > $c) $nf = '? status';
+			else $nf = $feed_stat[$row['n_feed']];
+			
+			$res .= "<tr><td width='130px'>status</td><td width='140px' class='status_text'>" . $st . "</td><td><a href='' id='let_" . $conn_id . "' onclick='javascript: showDialog(\"Loading letter...\"," . $conn_id . "); return false;'>letter</a></td></tr>".
+				"<tr><td>matching on</td><td class='code_text' colspan='2'>?, php,.....</td></tr></tr>".
+				"<tr><td>feedback from lead</td><td class='status_text'>" . $lf . "</td></tr>".
+				"<tr><td>feedback form need</td><td class='status_text'>" . $nf . "</td></tr>";
+		}
+		$res .= "</table>";
+		return $res;
+	}
+
+	function get_letter($conn_id){
+		if ($conn_id < 1) return('wrong connection id');
+		
+		$res = "<div class='div_dialog_close' onclick='closeDialog()'>close</div>";
+		
+		$db = new DBWrap();
+		$person = "select concat(l.email,', ',n.email) as emails, concat(l.gname,' ',l.lname) as lname, concat(n.gname,' ',n.lname) as nname, con.letter_subj as subject, con.letter as letter from connections as con left join person as l on l.id=con.leader_id left join person as n on n.id=con.seeker_id where con.id=" . $conn_id;
+		
+		$selection = $db->DoDBQueryEx($person);
+		if (!$selection) $res .= 'database error while retrieving persons emails data';
+		else {
+			$row = $db->GetDBQueryRowEx(0);
+
+			$res .= //"<input type='hidden' id='conn_id' value='" . $conn_id . "'>".
+				"<div class='let_dialheader'>introducing " . $row['nname'] . " to " . $row['lname'] . "</div><br>".
+				"<table class='let_table'><col width='70px'><col>".
+				"<tr><td>From</td><td><input type='text' size='40' value='brian@carrborocoworking.com' disabled></td></tr>".
+				"<tr><td>To</td><td><input type='text' size='40' value='" . $row['emails'] . "' id='sendto' disabled></td></tr>".
+				"<tr><td>Subject</td><td><input type='text' size='40' value='" . (empty($row['subject']) ? 'Introduction letter from Brian Russell 2' : $row['subject']) . "' id='subject'></td></tr>".
+				"<tr><td>Letter</td><td><textarea rows='12' cols='55' id='letter' wrap='hard'>" . $row['letter'] . "</textarea></td></tr>".
+				"<tr><td>&nbsp;</td><td><input type='button' value='Save draft' id='let_save' onclick='letter_save(" . $conn_id . ",0)'><input type='button' value='Send' id='let_ss' onclick='letter_save(" . $conn_id . ",1)'>&nbsp;&nbsp;&nbsp;<div class='progress' id='let_progr'></div></td></tr>".
+				"</table>";
+		}
+		return $res;
+	}
+
+	function save_letter($conn_id,$let_subject,$let_text,$send){
+		if ($conn_id < 1) return('wrong connection id');
+		$let_subject = addslashes($let_subject);
+		$let_text = addslashes($let_text);
+		
+		$db = new DBWrap();
+		$query = "update connections as con set con.letter_date=NOW(), con.letter_subj='" . $let_subject . "', con.letter='" . $let_text . "', con.letter_stat=1 where con.id=" . $conn_id;
+		
+		$selection = $db->DoDBQueryEx($query);
+		if (!$selection) return '1#error saving letter';
+		else $res = '0#letter saved';
+		
+		if ($send > 0) {
+			$to = 'vslbogdan@gmail.com'; // $_POST['sendto'];
+			$headers = 'From: vasil_bogdan@yahoo.com' . "\r\n" .
+				'Reply-To: vbogdan81@yandex.ru' . "\r\n" .
+				'X-Mailer: PHP/' . phpversion();
+
+			$mail_result = mail($to, $let_subject, $let_text, $headers);
+			
+			if ($mail_result) {$res = '0#letter saved and sent'; $st = 2;}
+			else {$res = '1#failed to send'; $st = 3;}
+			
+			$query="update connections as con set con.letter_stat=" . $st . " where con.id=" . $conn_id;
+			if (!$db->DoDbQueryEx($query)) $res = '1#error updating status';
+		}
 		return $res;
 	}
 	

@@ -1,28 +1,6 @@
 <?php
 	include('ln_library.php');
-/*	function print_skills($cols,$chbox,$all_skills,$pers_skills=''){
-		$count = count($all_skills);
-		$t = 1;
-		$sk = "<table cellspacing='3' class='sinfo'>";
-		for($i = 0; $i < $count; $i++){
-			if ($t == 1) $sk .= "<tr>";
-			$sk .= "<td>";
-			if ($pers_skills){
-				if (in_array($all_skills[$i],$pers_skills)) $ch = 'checked';
-				else $ch = '';
-			}
-			if ($chbox) $sk .= "<input type='checkbox' name='s_" . $all_skills[$i] . "' " . $ch . "> ";
-			$sk .= $all_skills[$i] . "</td>";
-			if ($t == $cols){
-				$t = 0;
-				$sk .= "</tr>";
-			}
-			$t++;
-		}
-		$sk .= "</table>";
-		return $sk;
-	}
-*/
+
 	if (empty($_POST['action'])) $action = 'new';
 	else $action = $_POST['action'];
 		

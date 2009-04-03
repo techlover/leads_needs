@@ -1,17 +1,6 @@
 <?php
-/*
-	$to = 'vslbogdan@gmail.com';
-	$subject = 'test';
-	$message = 'hello from php';
-	$headers = 'From: vasil_bogdan@yahoo.com' . "\r\n" .
-		'Reply-To: vasil_bogdan@yandex.com' . "\r\n" .
-		'X-Mailer: PHP/' . phpversion();
-
-	echo mail($to, $subject, $message, $headers);
-	exit;	
-*/
-	if (isset($_GET['conn_id'])) $id = $_GET['conn_id'];
-	else die('bad person id');
+	if (isset($_POST['conn_id'])) $id = $_POST['conn_id'];
+	else die('bad connection id');
 	include('dbwrap.php');
 	$db = new DBWrap();
 	
