@@ -3,7 +3,7 @@
 
 	if (empty($_POST['action'])) $action = 'new';
 	else $action = $_POST['action'];
-		
+	
 	$sk = "";
 	$bt = "";
 	$hid="";
@@ -24,7 +24,7 @@
 				$sk = print_skills(4,1,$row['ids'],$row['skills']);
 			}
 			list($gname,$lname,$address,$zip,$phone,$email,$url) = array();
-			$bt = "<input type=\"button\" value=\"Add contact\" id='cont_add'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\" id='cont_cancel'>";
+			$bt = "<input type=\"submit\" value=\"Add contact\" id='cont_add'> <input type=\"reset\" value=\"Clear form\"> <input type=\"button\" value=\"Cancel\" id='cont_cancel'>";
 			$hid = "";
 			break;
 		}case 'edit': {
@@ -152,6 +152,35 @@
 			$db->DoDBQueryEx($query) or die('error while disabling contact\'s skills');			
 			include('connections.php');
 			exit;
+		}case 'upl_cfile':{
+			include ('fupload.php');
+			if ($_FILES['cont_file']['error'] === UPLOAD_ERR_OK) { 
+				$store_file = 'uploads/' . basename($_FILES['cont_file']['name']);
+				if (move_uploaded_file($_FILES['cont_file']['tmp_name'],$store_file)) {$res = 0; $mess = 'file uploaded successfuly';}
+				$parse = parse_cont_file($store_file);
+			}else {
+				$res = $_FILES['cont_file']['error'];
+				$mess = fuplode_codeToMessage($_FILES['cont_file']['error']);
+				$parse = '';
+			}
+			echo '<script language="javascript" type="text/javascript">',
+				'window.top.window.uploadResult(' . $res . ',"' . $mess . '","' . $parse . '");',
+				'</script>';			
+			break;
+		}case 'import_contacts':{
+			$ids = '';
+			$pts = '';
+			foreach ($_POST as $key=>$val) {
+				//echo $key . ' => ' . $val . '<br>';
+				$tmp = explode('_',$key);
+				if ($tmp[0] == 'p') { $ids .= $tmp[1] . ','; $pts .= $_POST['pt_' . $tmp[1]] . ',';}
+			}
+			$ids = rtrim($ids,',');
+			$pts = rtrim($pts,',');
+			$query = "insert into person(ptype,created,gname,lname,address,zip,phone,email,url,company) select ELT(FIELD(tmp.id," . $ids . ")," . $pts . "), NOW(), tmp.gname, tmp.lname, tmp.address, tmp.zip, tmp.phone, tmp.email, tmp.url, tmp.company from tmp_persons as tmp where tmp.id in (" . $ids . ")";
+			//echo $query;
+			if (!$db->DoDBQueryEx($query)) echo 'Could not import contacts!';
+			break;
 		}
 	}
 
@@ -161,9 +190,11 @@
 	else $lead = 'checked';
 	
 	//list($gname,$lname,$address,$zip,$phone,$email,$url) = new array();
-	if ($action != 'save') echo "<h3>Adding personal information</h3><br>",
+	if (($action != 'save') && ($action != 'import_contacts')) echo "Contacts",//"<div class='separator'>Contacts</div>",
+		"<div class='cont_choise'><input type='radio' name='add_cont' id='man_cadd' checked onmouseup=change_cont_choise(this)> add contact manually&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;<input type='radio' name='add_cont' id='upl_cadd' onmouseup=change_cont_choise(this)> import from vCard file</div><br>",
 		//"<form action='index.php' method='POST'>",
-		"<form>",
+		"<form id='upl_cform' enctype='multipart/form-data' method='POST' action='contact.php' onsubmit='return uploadFile()' target='upl_fake_target'><p>Please select vCard file to upload</p><input type='hidden' name='MAX_FILE_SIZE' value='20000'><input type='hidden' name='action' value='upl_cfile'><input type='file' name='cont_file' id='cont_file' size='40' accept='text/html'><br><input type='submit' value='View contacts'>&nbsp;&nbsp;&nbsp;<div class='progress' id='upl_fstatus'></div></form><div id='parse_result'></div><iframe id='upl_fake_target' name='upl_fake_target' src='#' style='display: none'></iframe>",
+		"<form id='manual_cform' method='POST' action='contact.php' onsubmit='return validate_cont_info()'>",
 		"<input type='hidden' name='action' value='cont_new'>",
 		"<div class='separator'>Personal data</div>",
 		"<table cellpadding='5' id='pinfo' class='pinfo'>",
@@ -172,8 +203,8 @@
 		"<tr><td>Last Name<sup class='red'>*</sup></td><td><input type=\"text\" size=20 maxlength=40 id=\"lname\" name=\"lname\" value='",$lname,"'></td></tr>",
 		"<tr><td>Company</td><td><input type=\"text\" size=20 maxlength=40 id=\"company\" name=\"company\" value='",$company,"'></td></tr>",
 		"<tr><td>Address</td><td><input type=\"text\" size=30 maxlength=100 id=\"address\" name=\"address\" value='",$address,"'>&nbsp;&nbsp;",
-		"ZIP&nbsp;&nbsp;&nbsp;<input type=\"text\" size=5 maxlength=5 id=\"zip\" name=\"zip\" value='",($zip ? $zip : ''),"'></td></tr>",
-		"<tr><td>Phone</td><td><input type=\"text\" size=12 maxlength=12 id=\"phone\" name=\"phone\" value='",$phone,"'></td></tr>",
+		"ZIP&nbsp;&nbsp;&nbsp;<input type=\"text\" size=5 maxlength=5 id=\"zip\" name=\"zip\" value='",($zip ? $zip : ''),"' onkeyup='this.value=filterDigitField(this.value)'></td></tr>",
+		"<tr><td>Phone</td><td><input type=\"text\" size=12 maxlength=12 id=\"phone\" name=\"phone\" value='",$phone,"' onkeyup='this.value=filterDigitField(this.value)'></td></tr>",
 		"<tr><td>Email<sup class='red'>*</sup></td><td><input type=\"text\" size=30 maxlength=40 id=\"email\" name=\"email\" value='",$email,"'></td></tr>",
 		"<tr><td>URL</td><td><input type=\"text\" size=30 maxlength=60 id=\"url\" name=\"url\" value='",$url,"'></td></tr>",
 		"</table>",

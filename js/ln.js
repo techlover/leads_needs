@@ -80,12 +80,81 @@ var message = function(div_id, display, msg, background, fade){
 	let.html(msg); 
 	if (display != ''){
 		let.css({'display' : display, 'opacity' : '1'}); 
-	}else if (fade) let.fadeOut(2000);};
+	}//else 
+	if (fade) let.fadeOut(2000);};
 
 //-------------------------------------------------------------------
 function workContacts(){
-// load content for work with contacts
-	alert('contacts');
+// load content for add contact manually
+	$.ajax({
+		type: 'POST',
+		dataType: 'html',
+		cache: false,
+		url: 'contact.php',
+		data: 'action=new',
+		success: function(new_content){$('#middle').html(new_content);},
+		error: function(new_content){message('feed_progr','','connection failed','#D74E4E',false);}
+	});	
+}
+
+function change_cont_choise(obj){
+// change contact input. Choises are: manual and vCard
+	if (!obj.checked){
+		var displ = new Array('block','none');
+		var d = 1;
+		if (obj.id == 'man_cadd') d = 0;
+		document.forms['manual_cform'].style.display = displ[d];
+		document.forms['upl_cform'].style.display = displ[Number(!d)];
+		document.getElementById('parse_result').style.display = displ[Number(!d)];
+	}
+}
+
+function uploadFile(){
+// check uploading file extension and show message before uploading
+	var fname = document.forms['upl_cform'].cont_file.value;
+	var len = fname.length;
+	var ext = fname.substring(len-3,len);
+	if (ext != 'vcf') {
+		alert('You selected <' + fname + '> file. Please select *.cvf file insted!');
+		return false;
+	}else {
+		message('upl_fstatus','inline-block','Loading...','#8FBC8F',0);
+		return true;
+	}
+}
+
+function uploadResult(error,mesg,parse){
+// execute this after uploading vCard file.
+	var bg = '#8FBC8F';
+	if (error) bg = '#D74E4E';
+	message('upl_fstatus','inline-block',mesg,bg,!error);
+	if (parse) document.getElementById('parse_result').innerHTML = parse;
+}
+
+function selectContacts(type){
+	var checks = $('.tmp_table :checkbox:enabled');
+	if (type == 0) checks.attr('checked',false);
+	else if (type == 1) checks.attr('checked',true);
+		else {
+			var sz = checks.size();
+			for (var i = 0; i < sz; i++) checks.eq(i).attr('checked',!checks.eq(i).attr('checked'));
+		}
+}
+
+function checkImport(){
+// disable useless input elements
+	var persons = $('.tmp_table :checkbox:checked');
+	if (persons.size() == 0) {alert('No one contact is selected for import'); return false;}
+	
+	persons = $('.tmp_table :checkbox');	
+	var c = persons.size();
+	for (var i = 0; i < c; i++)
+		if (!persons.eq(i).is(':checked')){
+			persons.eq(i).attr('disabled',true);
+			var id = persons.eq(i).attr('id').substring(2);
+			$('.tmp_table :radio[id$=' + id + ']').attr('disabled',true);
+		}
+	return true;
 }
 //-------------------------------------------------------------------
 
@@ -100,12 +169,6 @@ function workSkills(){
 function workFeedbacks(){
 // load content for work with feedbacks
 	message('feed_progr','inline-block','sending emails...','#8FBC8F',false);
-/*	var progr = document.getElementById('feed_progr');
-	progr.style.display = 'inline-block';
-	progr.style.backgroundColor = '#8FBC8F';
-	progr.style.opacity = 1;
-	progr.innerHTML = 'sending emails...';
-*/	
 	$.ajax({
 		type: 'POST',
 		dataType: 'html',
@@ -157,12 +220,7 @@ function closeDialog(){
 function letter_save(conn_id, send){
 // save or send letter
 	message('let_progr','inline-block','error sending request','#D74E4E',false);
-/*	var progr = document.getElementById('let_progr');
-	progr.style.display = 'inline-block';
-	progr.style.backgroundColor = '#8FBC8F';
-	progr.style.opacity = 1;
-	progr.innerHTML = 'saving...';
-*/	$.ajax({
+	$.ajax({
 		type: 'POST',
 		dataType: 'html',
 		cache: false,

@@ -30,6 +30,7 @@
 
 // ----------------------------------- functions --------------------------------------------------
 	function get_plist($ptype,$show_summary){
+	// get list of leads or need, depending on $ptype
 		$db = new DBWrap();
 		$cls = array('ps','ps');
 		if (!isset($_POST['sortby'])) {
@@ -340,8 +341,8 @@
 		
 		if ($send > 0) {
 			$to = 'vslbogdan@gmail.com'; // $_POST['sendto'];
-			$headers = 'From: vasil_bogdan@yahoo.com' . "\r\n" .
-				'Reply-To: vbogdan81@yandex.ru' . "\r\n" .
+			$headers = 'From: vslbogdan@gmail.com' . "\r\n" .
+				'Reply-To: vslbogdan@gmail.com' . "\r\n" .
 				'X-Mailer: PHP/' . phpversion();
 
 			$mail_result = mail($to, $let_subject, $let_text, $headers);

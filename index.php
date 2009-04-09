@@ -14,8 +14,14 @@
 	<div id='div_dialog' class="div_dialog"></div>
 	<div id="top">
 			<b>Welcome to Leads and Needs.</b>
-			&nbsp;&nbsp;&nbsp;<a href="">Connections</a> | <a href="" onclick='javascript: workContacts(); return false;'>Contacts</a> | <a href="" onclick='javascript: workSkills(); return false;'> Skills</a> | <a href="" onclick='javascript: workFeedbacks(); return false;'>Ask feedbacks</a> | <a href="" onclick='javascript: settings(); return false;'> Settings</a>&nbsp;&nbsp;&nbsp;<div class='progress' id='feed_progr'></div>
+			&nbsp;&nbsp;&nbsp;<a href="">Connections</a> | <a href="" onclick='javascript: workContacts(); return false;'>Contacts</a> | <a href="" onclick='javascript: workSkills(); return false;'> Skills</a> | <a href="" onclick='javascript: workFeedbacks(); return false;'>Get feedback</a> | <a href="" onclick='javascript: settings(); return false;'> Settings</a>&nbsp;&nbsp;&nbsp;<div class='progress' id='feed_progr'></div>
 	</div>
+	<?php
+		if ($_POST['action'] == 'import_contacts'){
+			include('contact.php');
+		}
+	?>
+	
 <div id="container">
 	
 	<!-- This list should grow dynamically with the newest item on top. aka Chronological order. -->
